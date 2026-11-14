@@ -49,7 +49,7 @@ async function checkGenerated(dir) {
 			const text = await readFile(file, 'utf8');
 			assert.ok(!privateTerms.some((term) => text.includes(term)), `Private detail in ${path.relative(root, file)}`);
 			if (entry.name.endsWith('.html')) {
-				assert.ok(text.includes('/social/avatar-round.png?v=20261114-round'), `Avatar favicon missing in ${entry.name}`);
+				assert.ok(text.includes('/social/avatar-soft-square.png?v=20261114-square'), `Avatar favicon missing in ${entry.name}`);
 				assert.ok(!text.includes('href="/favicon.svg"'), 'Old H favicon is still linked');
 			}
 			count++;
@@ -57,15 +57,26 @@ async function checkGenerated(dir) {
 	}
 	return count;
 }
-// 页签须是真透明的圆形，不能用画出的棋盘格冒充 alpha。
-const avatar = sharp(path.join(root, 'public/social/avatar-round.png'));
+// 页签与站内头像统一为圆角方形；四角透明，但不能退化成圆形。
+const avatar = sharp(path.join(root, 'public/social/avatar-soft-square.png'));
 const avatarMeta = await avatar.metadata();
-assert.ok(avatarMeta.hasAlpha, 'Round favicon must have alpha');
-assert.equal(avatarMeta.width, avatarMeta.height, 'Favicon must be square-sized with circular pixels');
+assert.ok(avatarMeta.hasAlpha, 'Rounded-square favicon must have alpha');
+assert.equal(avatarMeta.width, avatarMeta.height, 'Favicon must have square dimensions');
 const { data: avatarPixels, info: avatarInfo } = await avatar.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 for (const [x, y] of [[0, 0], [avatarInfo.width - 1, 0], [0, avatarInfo.height - 1], [avatarInfo.width - 1, avatarInfo.height - 1]]) {
 	assert.equal(avatarPixels[(y * avatarInfo.width + x) * 4 + 3], 0, 'Favicon corner must be transparent');
 }
+const alphaAt = (x, y) => avatarPixels[(y * avatarInfo.width + x) * 4 + 3];
+assert.equal(alphaAt(Math.floor(avatarInfo.width / 2), 0), 255, 'Top edge must be opaque');
+assert.equal(alphaAt(Math.floor(avatarInfo.width / 12), Math.floor(avatarInfo.height / 12)), 255, 'Rounded square must retain more of its corners than a circle');
+const originalPixels = await sharp(path.join(root, 'public/social/xiaohongshu-avatar.webp')).ensureAlpha().raw().toBuffer();
+for (let i = 0; i < avatarPixels.length; i += 4) {
+	for (let c = 0; c < 3; c++) assert.equal(avatarPixels[i + c], originalPixels[i + c], 'Avatar RGB must stay unchanged');
+}
+const avatarCSS = await readFile(path.join(root, 'src/components/AccountCards.astro'), 'utf8');
+assert.ok(avatarCSS.includes('border-radius: var(--avatar-radius)'), 'Account avatars must use shared rounding');
+const globalCSS = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
+assert.ok(globalCSS.includes('--avatar-radius: 16.6667%'), 'Avatar rounding must match favicon');
 const homeHTML = await readFile(path.join(root, 'dist/index.html'), 'utf8');
 const home = homeHTML.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
 assert.ok(home, 'Homepage main missing');
@@ -75,4 +86,4 @@ assert.ok(home.includes('/content/early-video-regret/'), 'Second video missing o
 assert.ok((home.match(/<img\b/g) || []).length >= 5, 'Homepage has lost its image-led layout');
 assert.ok(!home.includes('截图待补') && !home.includes('照片待补'), 'Placeholder images must not lead the homepage');
 const checked = await checkGenerated(path.join(root, 'dist'));
-console.log(`PASS: image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, transparent round favicon; ${checked} generated files scanned for identifying details.`);
+console.log(`PASS: image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);

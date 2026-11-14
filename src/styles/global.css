@@ -21,6 +21,7 @@
 	--wrap: 1180px;
 	--gutter: clamp(20px, 4vw, 40px);
 	--r: 6px;
+	--avatar-radius: 16.6667%; /* 头像与页签统一为圆角方形 */
 	--top: 60px;
 }
 
