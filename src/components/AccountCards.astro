@@ -1,0 +1,324 @@
+---
+import { accounts } from '../data/accounts';
+import type { Account } from '../data/accounts';
+
+interface Props {
+	class?: string;
+}
+
+const { class: cls } = Astro.props;
+const entries: readonly Account[] = accounts;
+const groupId = `accounts-${crypto.randomUUID()}`;
+---
+
+<account-cards class:list={['account-grid', cls]}>
+	{
+		entries.map((account, index) => {
+			const panelId = `${groupId}-${index}`;
+			const titleId = `${panelId}-title`;
+			const items = account.href ? account.items.slice(0, 3) : [];
+			return (
+				<details class="account-card" name={groupId} data-account={account.id}>
+					<summary class="account-summary" aria-controls={panelId}>
+						<span class="account-label">{account.label}</span>
+						<span class="account-name">{account.name}</span>
+						<span class="account-toggle" aria-hidden="true" />
+						<span class="account-sr">，账号预览</span>
+					</summary>
+					<section class="account-preview" id={panelId} aria-labelledby={titleId} tabindex="0">
+						<header class="account-identity">
+							{account.avatar && (
+								<img class="account-avatar" src={account.avatar} alt={`${account.name}的头像`} width="48" height="48" loading="lazy" decoding="async" />
+							)}
+							<div>
+								<span class="account-label">{account.label} · 账号便签</span>
+								<h3 id={titleId}>{account.name}</h3>
+								{account.handle && <p class="account-handle">{account.handle}</p>}
+							</div>
+						</header>
+						<p class="account-description">{account.description}</p>
+						{items.length > 0 && (
+							<div class="account-items">
+								<h4>{account.itemsLabel || '代表作'}</h4>
+								<ol>
+									{items.map((item) => (
+										<li>
+											<a href={item.href} target="_blank" rel="noopener noreferrer">
+												<span>{item.title}</span>
+												{item.kind && <small>{item.kind}</small>}
+												<span class="account-link-arrow" aria-hidden="true">↗</span>
+											</a>
+										</li>
+									))}
+								</ol>
+							</div>
+						)}
+						{account.qr && (
+							<figure class="account-qr">
+								<img src={account.qr.src} alt={account.qr.alt} width="176" height="176" loading="lazy" decoding="async" />
+								<figcaption>{account.qr.caption}</figcaption>
+							</figure>
+						)}
+						{account.note && <p class="account-note">{account.note}</p>}
+						{(account.href || account.verifiedAt) && (
+							<footer class="account-footer">
+								{account.href && <a class="account-home" href={account.href} target="_blank" rel="noopener noreferrer">去主页 <span aria-hidden="true">↗</span><span class="account-sr">（新窗口打开）</span></a>}
+								{account.verifiedAt && <span class="account-verified">核对于 {account.verifiedAt}</span>}
+							</footer>
+						)}
+					</section>
+				</details>
+			);
+		})
+	}
+</account-cards>
+
+<script>
+	class AccountCardsElement extends HTMLElement {
+		private cleanup?: () => void;
+
+		connectedCallback() {
+			if (this.cleanup) return;
+			const controller = new AbortController();
+			const { signal } = controller;
+			const cards = Array.from(this.querySelectorAll<HTMLDetailsElement>('.account-card'));
+			const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+			const desktop = matchMedia('(min-width: 861px)');
+			let hovered: HTMLDetailsElement | null = null;
+			let leaveTimer: ReturnType<typeof setTimeout> | undefined;
+			let frame = 0;
+
+			const sync = (card: HTMLDetailsElement) => {
+				// 原生 details 在无 JS 时自行报告状态；增强后再添加显式 ARIA。
+				card.querySelector('summary')?.setAttribute('aria-expanded', String(card.open));
+			};
+			const close = (card: HTMLDetailsElement, returnFocus = false) => {
+				const focusedInPanel = card.querySelector('.account-preview')?.contains(document.activeElement);
+				card.open = false;
+				delete card.dataset.positioned;
+				if (hovered === card) hovered = null;
+				sync(card);
+				if (returnFocus || focusedInPanel) card.querySelector('summary')?.focus({ preventScroll: true });
+			};
+			const place = (card: HTMLDetailsElement) => {
+				if (!card.open) return;
+				if (!desktop.matches) {
+					delete card.dataset.positioned;
+					return;
+				}
+				const panel = card.querySelector<HTMLElement>('.account-preview');
+				if (!panel) return;
+				card.dataset.positioned = '';
+				const rect = card.getBoundingClientRect();
+				const width = panel.getBoundingClientRect().width;
+				const edge = 16;
+				const topBar = parseFloat(getComputedStyle(this).getPropertyValue('--top')) || 0;
+				const ceiling = Math.min(topBar + edge, window.innerHeight - edge);
+				const below = window.innerHeight - edge - rect.bottom - 8;
+				const above = rect.top - ceiling - 8;
+				const useBelow = below >= Math.min(panel.scrollHeight, 240) || below >= above;
+				let height = Math.min(512, Math.max(0, useBelow ? below : above));
+				// 空间不足时允许覆盖卡片，但始终留在可见视口并可滚动。
+				const overlap = height < 160;
+				if (overlap) height = Math.max(0, window.innerHeight - ceiling - edge);
+				panel.style.setProperty('--preview-height', `${height}px`);
+				// 向上展开必须按实际高度贴住卡片，而不是按 max-height 留出空洞。
+				const actualHeight = panel.getBoundingClientRect().height;
+				const top = overlap ? ceiling : useBelow ? rect.bottom + 8 : rect.top - actualHeight - 8;
+				const left = Math.max(edge, Math.min(rect.left, document.documentElement.clientWidth - width - edge));
+				panel.style.setProperty('--preview-left', `${left - rect.left}px`);
+				panel.style.setProperty('--preview-top', `${top - rect.top}px`);
+			};
+			const closeOthers = (current: HTMLDetailsElement) => {
+				cards.forEach((card) => { if (card !== current && card.open) close(card); });
+			};
+			const scheduleClose = (card: HTMLDetailsElement) => {
+				clearTimeout(leaveTimer);
+				leaveTimer = setTimeout(() => {
+					if (hovered === card && !card.matches(':hover') && !card.contains(document.activeElement)) close(card);
+				}, 180);
+			};
+
+			cards.forEach((card) => {
+				sync(card);
+				card.addEventListener('toggle', () => {
+					if (card.open) { closeOthers(card); place(card); }
+					else { delete card.dataset.positioned; if (hovered === card) hovered = null; }
+					sync(card);
+				}, { signal });
+				card.addEventListener('pointerenter', (event) => {
+					if (!finePointer.matches || event.pointerType === 'touch') return;
+					clearTimeout(leaveTimer);
+					// 不让路过的鼠标打断另一张便签内的键盘阅读。
+					if (cards.some((other) => other !== card && other.open && other.contains(document.activeElement))) return;
+					if (!card.open) {
+						closeOthers(card);
+						hovered = card;
+						card.open = true;
+						sync(card);
+						place(card);
+					}
+				}, { signal });
+				card.addEventListener('pointerleave', () => { if (hovered === card) scheduleClose(card); }, { signal });
+				card.addEventListener('focusout', () => { if (hovered === card) scheduleClose(card); }, { signal });
+				card.querySelector('summary')?.addEventListener('click', (event) => {
+					// 悬停已打开时，第一次鼠标点击固定便签；再次点击才收起。
+					if (hovered === card && card.open && event.detail > 0) {
+						event.preventDefault();
+						hovered = null;
+						clearTimeout(leaveTimer);
+					}
+				}, { signal });
+			});
+
+			const reposition = () => {
+				cancelAnimationFrame(frame);
+				frame = requestAnimationFrame(() => cards.forEach(place));
+			};
+			// 二维码/头像加载或字号变化后，向上的面板仍紧贴小卡片。
+			const observer = new ResizeObserver(reposition);
+			cards.forEach((card) => {
+				const panel = card.querySelector('.account-preview');
+				if (panel) observer.observe(panel);
+			});
+			window.addEventListener('resize', reposition, { passive: true, signal });
+			window.addEventListener('scroll', reposition, { capture: true, passive: true, signal });
+			desktop.addEventListener('change', reposition, { signal });
+			finePointer.addEventListener('change', () => { if (hovered) close(hovered); }, { signal });
+			document.addEventListener('pointerdown', (event) => {
+				const target = event.target;
+				if (target instanceof Node) cards.forEach((card) => { if (card.open && !card.contains(target)) close(card); });
+			}, { signal });
+			document.addEventListener('keydown', (event) => {
+				if (event.key !== 'Escape' || event.defaultPrevented) return;
+				const card = cards.find((entry) => entry.open);
+				const focusedGroup = document.activeElement?.closest('account-cards');
+				if (!card || (focusedGroup && focusedGroup !== this)) return;
+				event.preventDefault();
+				clearTimeout(leaveTimer);
+				close(card, true);
+			}, { signal });
+			this.cleanup = () => {
+				controller.abort();
+				observer.disconnect();
+				clearTimeout(leaveTimer);
+				cancelAnimationFrame(frame);
+			};
+		}
+
+		disconnectedCallback() {
+			this.cleanup?.();
+			this.cleanup = undefined;
+		}
+	}
+
+	if (!customElements.get('account-cards')) customElements.define('account-cards', AccountCardsElement);
+</script>
+
+<style>
+	.account-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(170px, 100%), 1fr));
+		gap: 10px;
+		align-items: start;
+	}
+	.account-card {
+		position: relative;
+		min-width: 0;
+		border: 1px solid var(--rule);
+		border-radius: var(--r);
+		background: var(--paper-2);
+		font-size: 15px;
+	}
+	.account-card[open] { border-color: var(--ink-3); }
+	.account-summary {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		column-gap: 10px;
+		padding: 14px 16px;
+		cursor: pointer;
+		list-style: none;
+		border-radius: var(--r);
+	}
+	.account-summary::-webkit-details-marker { display: none; }
+	.account-label {
+		display: block;
+		font-family: var(--mono);
+		font-size: 12px;
+		letter-spacing: 0.04em;
+		color: var(--ink-3);
+	}
+	.account-summary .account-label { grid-column: 1; margin-bottom: 2px; }
+	.account-name { grid-column: 1; overflow-wrap: anywhere; }
+	.account-toggle { grid-column: 2; grid-row: 1 / 3; align-self: center; font-family: var(--mono); color: var(--ink-3); }
+	.account-toggle::before { content: '+'; }
+	.account-card[open] .account-toggle::before { content: '−'; color: var(--accent); }
+	.account-summary:focus-visible, .account-preview a:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 3px;
+	}
+	.account-preview {
+		min-width: 0;
+		padding: 20px;
+		border-top: 1px dashed var(--rule);
+		overflow-wrap: anywhere;
+		background: var(--paper-2);
+		border-radius: 0 0 var(--r) var(--r);
+	}
+	.account-preview:focus-visible { outline: 2px solid var(--accent); outline-offset: -5px; }
+	.account-identity { display: flex; align-items: center; gap: 12px; }
+	.account-identity > div { min-width: 0; }
+	.account-avatar { flex: none; width: 48px; height: 48px; object-fit: cover; border: 1px solid var(--rule); border-radius: 4px; }
+	.account-identity h3 { margin: 3px 0 0; font-family: var(--serif-zh); font-size: 24px; font-weight: 400; line-height: 1.3; }
+	.account-handle { margin: 4px 0 0; font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+	.account-description { margin: 16px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.7; text-wrap: pretty; }
+	.account-items { margin-top: 20px; }
+	.account-items h4 { margin: 0 0 6px; font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ink-3); }
+	.account-items ol { margin: 0; padding-left: 22px; }
+	.account-items li { border-top: 1px dashed var(--rule); padding: 9px 0 9px 2px; }
+	.account-items li::marker { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+	.account-items a { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; color: var(--accent); text-decoration: none; font-size: 14px; line-height: 1.55; }
+	.account-items a:hover > span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+	.account-items small { grid-column: 1; font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+	.account-link-arrow { grid-column: 2; grid-row: 1; }
+	.account-qr { margin: 20px 0 0; padding-top: 18px; border-top: 1px dashed var(--rule); }
+	.account-qr img { width: min(176px, 100%); height: auto; margin: 0 auto; border: 1px solid var(--rule); border-radius: 3px; }
+	.account-qr figcaption { margin-top: 9px; color: var(--ink-2); font-size: 12px; text-align: center; text-wrap: pretty; }
+	.account-note { margin: 16px 0 0; padding-left: 10px; border-left: 2px solid var(--marker); font-size: 12px; color: var(--ink-2); }
+	.account-footer { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--rule); }
+	.account-home { color: var(--accent); text-decoration: none; font-size: 14px; }
+	.account-home:hover { text-decoration: underline; text-underline-offset: 3px; }
+	.account-verified { font-family: var(--mono); font-size: 10px; color: var(--ink-3); }
+	.account-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+	@media (hover: hover) and (pointer: fine) {
+		.account-summary:hover { background: var(--paper-3); }
+		.account-summary:hover .account-toggle { color: var(--accent); }
+	}
+	@media (min-width: 861px) {
+		.account-card[open] { z-index: 8; }
+		.account-preview {
+			position: absolute;
+			top: var(--preview-top, calc(100% + 8px));
+			left: var(--preview-left, 0px);
+			width: 100%; /* 无 JS 时与小卡片等宽，不越过网格边界。 */
+			max-height: min(var(--preview-height, 60vh), 32rem);
+			overflow-y: auto;
+			overscroll-behavior-y: contain;
+			scrollbar-width: thin;
+			border: 1px solid var(--rule);
+			border-radius: var(--r);
+			box-shadow: 0 2px 0 var(--rule), 0 16px 32px -16px rgba(35, 37, 31, 0.3);
+		}
+		.account-card[data-positioned] .account-preview { width: min(380px, calc(100vw - 32px)); }
+		.account-card[open] .account-preview { animation: account-unfold 0.14s ease-out; }
+	}
+	@media (max-width: 860px) {
+		.account-card[open] { grid-column: 1 / -1; }
+		.account-preview { max-height: min(38rem, 70vh); overflow-y: auto; overscroll-behavior-y: contain; }
+	}
+	@keyframes account-unfold { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+	@media (prefers-reduced-motion: reduce) {
+		.account-card[open] .account-preview { animation: none; }
+	}
+</style>

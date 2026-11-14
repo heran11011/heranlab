@@ -1,5 +1,6 @@
 ---
 import Todo from '../components/Todo.astro';
+import AccountCards from '../components/AccountCards.astro';
 import { profile } from '../data/profile';
 import Base from '../layouts/Base.astro';
 ---
@@ -79,17 +80,7 @@ import Base from '../layouts/Base.astro';
 				<a href={`mailto:${profile.email}`}>{profile.email}</a>
 				<button class="copy" type="button" data-copy={profile.email}>复制</button>
 			</div>
-			<div class="platforms" style="margin-top:28px">
-				{
-					profile.platforms.map((p) =>
-						p.href ? (
-							<a href={p.href} target="_blank" rel="noopener"><span class="mono">{p.label}</span>{p.name} ↗</a>
-						) : (
-							<div><span class="mono">{p.label}</span>{p.name}{p.todo && <Todo label={p.todo} where={`平台 ${p.label}`} />}</div>
-						),
-					)
-				}
-			</div>
+			<div style="margin-top:28px"><AccountCards /></div>
 		</div>
 	</section>
 </Base>

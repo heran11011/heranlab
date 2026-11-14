@@ -180,14 +180,6 @@ img { max-width: 100%; height: auto; display: block; }
 .posts p { grid-column: 2 / 3; margin: 0; font-size: 14px; color: var(--ink-2); }
 .pill { font-family: var(--mono); font-size: 11px; border: 1px solid var(--rule); border-radius: 99px; padding: 0 8px; color: var(--ink-3); white-space: nowrap; }
 
-.platforms { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
-.platforms > * {
-	display: block; padding: 14px 16px; border: 1px solid var(--rule); border-radius: var(--r);
-	background: var(--paper-2); text-decoration: none; font-size: 15px;
-}
-.platforms a:hover { border-color: var(--ink-3); }
-.platforms .mono { display: block; margin-bottom: 2px; }
-
 .mail { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .mail a { font-family: var(--mono); font-size: clamp(20px, 3vw, 30px); letter-spacing: -0.01em; text-decoration: none; border-bottom: 1px solid var(--ink); line-height: 1.2; }
 

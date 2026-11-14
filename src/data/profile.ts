@@ -7,6 +7,8 @@
 // - 中文引号用 “”
 // - todo: true 的条目会在页面上显示“待补”，构建时也会在终端列出来
 
+import { accounts } from './accounts';
+
 export const profile = {
 	name: '禾冉',
 	nameEn: 'Heran',
@@ -57,12 +59,6 @@ export const profile = {
 	// 能力标签：资料底稿第五节，他愿意被这样描述的
 	skills: ['增长运营', '用户召回', '线下地推', '渠道投放', '数据复盘', '内容选题与写作', '多平台分发', '自己出物料', '把想法做成 MVP', '物联网 / 嵌入式背景'],
 
-	// href 为 null 的会显示“待补 链接”
-	platforms: [
-		{ label: '公众号', name: '“禾冉一起”', href: null, todo: null },
-		{ label: '小红书', name: '禾冉', href: null, todo: '链接' },
-		{ label: 'X', name: '@heran_ai', href: 'https://x.com/heran_ai', todo: null },
-		{ label: 'B 站', name: '“禾冉heran”', href: null, todo: '链接' },
-		{ label: 'GitHub', name: 'huntingrin', href: 'https://github.com/huntingrin', todo: null },
-	],
+	// 首页、关于页、404 页共用的公开账号资料。
+	platforms: accounts,
 } as const;
