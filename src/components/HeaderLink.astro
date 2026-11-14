@@ -5,7 +5,9 @@ type Props = HTMLAttributes<'a'>;
 
 const { href, class: className, ...props } = Astro.props;
 const first = Astro.url.pathname.match(/[^/]+/)?.[0];
-const isActive = !!first && href === `/${first}/`;
+// 旧博客文章属于内容栏目，保留 URL 的同时使用同一个导航入口。
+const section = first === 'blog' ? 'content' : first;
+const isActive = !!section && href === `/${section}/`;
 ---
 
 <a href={href} class:list={[className, { active: isActive }]} aria-current={isActive ? 'page' : undefined} {...props}>

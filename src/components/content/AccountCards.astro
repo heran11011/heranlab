@@ -1,0 +1,66 @@
+---
+import { accounts } from '../../data/accounts';
+
+// 内容页只用公开账号入口与二维码，不复用 bio、作品列表或 GitHub 源码。
+const wechat = accounts.find((account) => account.id === 'wechat');
+const entries = accounts.filter((account) => ['xiaohongshu', 'x', 'bilibili'].includes(account.id));
+---
+
+<div class="content-accounts">
+	<section class="content-wechat" aria-label="公众号二维码">
+		<div>
+			<span class="content-account-kicker">公众号 / 微信扫一扫</span>
+			<h3>留一个扫码入口。</h3>
+			<p>文章列表还没整理，<br />可以先去公众号看。</p>
+		</div>
+		{wechat?.qr && (
+			<figure>
+				<img src={wechat.qr.src} alt={wechat.qr.alt} width="144" height="144" loading="lazy" decoding="async" />
+				<figcaption>{wechat.qr.caption}</figcaption>
+			</figure>
+		)}
+	</section>
+	<ul class="content-account-links" aria-label="公开账号入口">
+		{entries.map((account) => (
+			<li>
+				{account.href && (
+					<a href={account.href} target="_blank" rel="noopener noreferrer">
+						<span class="content-account-platform">{account.label}</span>
+						<span class="content-account-handle">{account.handle || '账号主页'}</span>
+						<span class="content-account-arrow" aria-hidden="true">↗</span>
+						<span class="content-account-sr">（新窗口打开）</span>
+					</a>
+				)}
+			</li>
+		))}
+	</ul>
+</div>
+
+<style>
+	.content-accounts { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 32px; align-items: center; }
+	.content-wechat { display: grid; grid-template-columns: minmax(0, 1fr) 144px; gap: 24px; align-items: center; padding: 28px; border: 1px solid var(--rule); border-radius: var(--r); background: var(--paper-2); }
+	.content-wechat > * { min-width: 0; }
+	.content-account-kicker { font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
+	.content-wechat h3 { margin: 10px 0 12px; font-family: var(--serif-zh); font-size: 26px; line-height: 1.35; font-weight: 400; }
+	.content-wechat p { margin: 0; font-size: 14px; color: var(--ink-2); }
+	.content-wechat figure { margin: 0; }
+	.content-wechat img { width: 144px; height: auto; border: 1px solid var(--rule); border-radius: 3px; }
+	.content-wechat figcaption { margin-top: 8px; text-align: center; font-size: 11px; line-height: 1.6; color: var(--ink-2); }
+	.content-account-links { list-style: none; margin: 0; padding: 0; }
+	.content-account-links li + li { border-top: 1px dashed var(--rule); }
+	.content-account-links a { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 64px; padding: 18px 4px; text-decoration: none; }
+	.content-account-platform { font-family: var(--serif-zh); font-size: 20px; }
+	.content-account-handle { font-family: var(--mono); font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+	.content-account-arrow { color: var(--accent); }
+	.content-account-links a:hover .content-account-platform { text-decoration: underline; text-underline-offset: 5px; }
+	.content-account-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
+	.content-account-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+	@media (max-width: 860px) {
+		.content-accounts { grid-template-columns: 1fr; gap: 20px; }
+	}
+	@media (max-width: 440px) {
+		.content-wechat { grid-template-columns: minmax(0, 1fr) 112px; gap: 16px; padding: 20px; }
+		.content-wechat h3 { font-size: 22px; }
+		.content-account-links a { grid-template-columns: 66px minmax(0, 1fr) auto; }
+	}
+</style>

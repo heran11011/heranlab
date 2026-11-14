@@ -1,0 +1,206 @@
+[
+  {
+    "id": "dawdex-adventurex",
+    "title": "我们在 AdventureX 做了一个黑客松作品：DAWdex。",
+    "platform": "xiaohongshu",
+    "format": "note",
+    "topic": "自己做的项目",
+    "excerpt": "让弹幕成为音乐指令：从说感觉，到把鼓、贝斯、键盘写进 openDAW。",
+    "sourceUrl": "https://www.xiaohongshu.com/user/profile/663de8950000000007005e04/6a6551da0000000011006278?xsec_token=ABFXLkaEp2NwTL2AdPfLxwAB0-LpWTWUWfbuPhyxmQ_BY=&xsec_source=pc_user",
+    "sourceAuthor": "禾冉一起",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2026-07-26",
+    "paragraphs": [
+      "我们在 AdventureX 做了一个黑客松作品：DAWdex。",
+      "它是一个弹幕驱动的 AI 虚拟录音棚。",
+      "你不需要懂乐理，也不用会操作复杂的编曲软件，只要说一句：",
+      "“再炸一点”\n“像 Boss 战”\n“来点夏日晚风 Lo-fi”",
+      "AI 就会把这句话翻译成鼓、贝斯、键盘的音乐任务，然后写进 openDAW 工程里，让虚拟乐手逐轨演奏。",
+      "我们想解决的问题很简单：",
+      "很多人其实喜欢音乐，也有感觉，但一打开专业 DAW 软件就被劝退了。",
+      "所以我们不想再做一个“教你怎么用 DAW”的工具，而是想试试另一种方式：",
+      "让 AI 帮你操作 DAW，你只负责说感觉。",
+      "这是我们目前的第一个版本，还很粗糙，但已经能跑通：",
+      "弹幕输入 → AI 理解音乐意图 → 检索 MIDI 素材 → 写入 openDAW → 播放。",
+      "评论区可以丢一句你想听的风格，我们现场试试让 DAWdex 把它变成音乐。"
+    ],
+    "bodyLabel": "笔记原文",
+    "featured": true,
+    "cover": "/content/dawdex-adventurex.webp"
+  },
+  {
+    "id": "deepseek-roleplay",
+    "title": "DeepSeek V4 隐藏玩法，角色扮演直接封神",
+    "platform": "xiaohongshu",
+    "format": "note",
+    "topic": "AI 使用技巧",
+    "excerpt": "同样的角色指令，在快速模式和专家模式里得到不同的回复。",
+    "sourceUrl": "https://www.xiaohongshu.com/user/profile/663de8950000000007005e04/69edc05f000000003502ccc4?xsec_token=ABjkIcpqm9FPDtHz1KYHB93yM38MC1cOg_ZFbPTBW7l58=&xsec_source=pc_user",
+    "sourceAuthor": "禾冉一起",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2026-04-26",
+    "paragraphs": [
+      "刷 GitHub 发现一个 800+ 星的仓库，专门讲 DeepSeek V4 角色扮演的隐藏指令。",
+      "试了一下，效果差距大到离谱。",
+      "⚡ 图一：快速模式\n同样的指令发过去，完全没反应，回你一句“你好呀😊我是DeepSeek”——跟没加一样。",
+      "💎 图二图三：专家模式\n切到专家模式，同样的指令，AI 直接入戏了。",
+      "思考过程变成角色的内心独白👇\n“我瞥见对方发来的简短问候，心里琢磨着这人倒是挺有礼貌，但也不急着深聊……”",
+      "回复也完全是角色在说话，不是 AI 在回答。",
+      "📌 怎么用（三步）",
+      "① 打开 DeepSeek，切到“专家模式”\n② 第一条消息正常写你的开场白\n③ 末尾粘贴下面这段指令（评论区可复制）：",
+      "【角色沉浸要求】在你的思考过程中，请遵守以下规则：\n1. 以角色第一人称进行内心独白\n2. 用第一人称描写角色的内心感受\n3. 思考内容应沉浸在角色中，通过内心独白分析剧情和规划回复",
+      "之后正常聊天就行，不用每轮都加。",
+      "💡 原理很简单：模型每次回复都能看到完整对话历史，第一轮的指令会一直在上下文里，全程自动生效。",
+      "这不是越狱，是 V4 官方训练进去的能力，只是没做成按钮。",
+      "评论区楼1，get 纯分析模式的提示词",
+      "去试试，可以来聊聊效果 👇"
+    ],
+    "bodyLabel": "笔记原文",
+    "featured": true,
+    "cover": "/content/deepseek-roleplay.webp"
+  },
+  {
+    "id": "my-xiaohei-skill",
+    "title": "5.5k⭐ 的小黑 skill，我改成了自己的形象",
+    "platform": "xiaohongshu",
+    "format": "video",
+    "topic": "创作过程",
+    "excerpt": "从三根毛、黑蛋到火柴人：把开源配图 skill 改成自己的形象。",
+    "sourceUrl": "https://www.xiaohongshu.com/user/profile/663de8950000000007005e04/6a38ab92000000000f02b753?xsec_token=ABB1peaNwj2EcLPxhDRjIjcCasTG-52aFLad7YeZVETxw=&xsec_source=pc_user",
+    "sourceAuthor": "禾冉一起",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2026-06-22",
+    "paragraphs": [
+      "GitHub 上那个 5.5k⭐ 的小黑配图 skill 大家用了吗？ 我用了，但我不想用小黑，想用 Cola 改成自己的形象",
+      "然后翻车开始了：\n❌ 第一版：三毛流浪记（头上三根毛被雨淋了一宿） ❌ 第二版：一坨黑蛋（两个白点当眼睛，没手没脚） ❌ 第三版：一根香肠（四肢像从香肠上拔出来的牙签）",
+      "最后发现越简单越对 圆头+卷毛+火柴人四肢，画得烂就对了 荒诞中透露出我的精神状态 🫠",
+      "想改成自己 IP 的： GitHub 拼音搜 xiaohei，fork 下来改角色描述就行 MIT 开源，随便改"
+    ],
+    "bodyLabel": "视频简介原文",
+    "featured": true
+  },
+  {
+    "id": "mac-autofill",
+    "title": "没人吐槽一下 Mac 的这个自动填充很鸡肋吗",
+    "platform": "xiaohongshu",
+    "format": "note",
+    "topic": "日常观察",
+    "excerpt": "一个关不掉的自动填充提示，打断了原本简单的登录。",
+    "sourceUrl": "https://www.xiaohongshu.com/user/profile/663de8950000000007005e04/6ad7418b00000000250363ff?xsec_token=AB19ADrTEM7OgSuZKlNGRjWETTV9eUjKwr0MF0OyK4E3A=&xsec_source=pc_user",
+    "sourceAuthor": "禾冉一起",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2026-10-20",
+    "paragraphs": [
+      "我真的服了，这个自动填充为什么点不掉，我真的要气死了，我靠"
+    ],
+    "bodyLabel": "笔记原文",
+    "featured": false,
+    "cover": "/content/mac-autofill.webp"
+  },
+  {
+    "id": "personal-card-with-ai",
+    "title": "Ai 时代的个人名片，五分钟搞定",
+    "platform": "xiaohongshu",
+    "format": "video",
+    "topic": "自己做的项目",
+    "excerpt": "用 Cola 做个人网站，再把它部署上线。",
+    "sourceUrl": "https://www.xiaohongshu.com/user/profile/663de8950000000007005e04/69fc735900000000350319c0?xsec_token=ABUI9bQfyYgYFtt7Sevw0CLw-sanVmY_c3RiPgKihceKU=&xsec_source=pc_user",
+    "sourceAuthor": "禾冉一起",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2026-05-07",
+    "paragraphs": [
+      "五分钟用Cola 做了个人网站，直接部署上线"
+    ],
+    "bodyLabel": "视频简介原文",
+    "featured": false
+  },
+  {
+    "id": "meme-art-origin",
+    "title": "一直用的表情包，竟然是一位艺术家的作品",
+    "platform": "xiaohongshu",
+    "format": "note",
+    "topic": "日常观察",
+    "excerpt": "刷 Reddit 时，找到了常用表情包背后的艺术作品。",
+    "sourceUrl": "https://www.xiaohongshu.com/user/profile/663de8950000000007005e04/693fb30b000000001e000491?xsec_token=ABfwAcc3Plk8lEN0zfbtKwx1gTrNANb9A-nWA2YrvFCII=&xsec_source=pc_user",
+    "sourceAuthor": "禾冉一起",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2025-12-15",
+    "paragraphs": [
+      "今天刷reddit的时候，发现，我们一直用的那个流口水的婴儿的表情包是一位艺术家Dallas Rayburn的艺术作品"
+    ],
+    "bodyLabel": "笔记原文",
+    "featured": false,
+    "cover": "/content/meme-art-origin.webp"
+  },
+  {
+    "id": "dawdex-video",
+    "title": "当弹幕开始作曲，音乐被反转了",
+    "platform": "bilibili",
+    "format": "video",
+    "topic": "自己做的项目",
+    "excerpt": "我们做了一个弹幕驱动的 AI 虚拟录音棚。",
+    "sourceUrl": "https://www.bilibili.com/video/BV1LA3j6vE6d/",
+    "sourceAuthor": "禾冉heran",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2026-07-26",
+    "cover": "/content/dawdex-video.jpg",
+    "paragraphs": [
+      "我们做了一个弹幕驱动的 AI 虚拟录音棚。",
+      "在 DAWdex 里，弹幕不再只是评论，而是创作指令。\n你说“再炸一点”，AI 会把它变成鼓、贝斯、键盘的具体音乐任务，让虚拟乐手逐轨演奏。"
+    ],
+    "bodyLabel": "视频简介原文"
+  },
+  {
+    "id": "early-video-regret",
+    "title": "能有什么不遗憾的，还是没得到...",
+    "platform": "bilibili",
+    "format": "video",
+    "topic": "早期影像",
+    "excerpt": "你会有遗憾吗？",
+    "sourceUrl": "https://www.bilibili.com/video/BV1LG411K7U6/",
+    "sourceAuthor": "禾冉heran",
+    "verifiedAt": "2026-11-14",
+    "publishedAt": "2022-12-13",
+    "cover": "/content/early-video-regret.jpg",
+    "paragraphs": [
+      "你会有遗憾吗？"
+    ],
+    "bodyLabel": "视频简介原文"
+  },
+  {
+    "id": "ai-phone-credit",
+    "title": "本来想试试，让 AI 去给我的手机号充话费",
+    "platform": "x",
+    "format": "post",
+    "topic": "自动化实测",
+    "excerpt": "让 AI 试着充值，最后变成了一次积分兑换。",
+    "sourceUrl": "https://x.com/heran_ai/status/2112344331868877238",
+    "sourceAuthor": "Heran · @heran_ai",
+    "verifiedAt": "2026-11-14",
+    "bodyLabel": "帖子原文",
+    "paragraphs": [
+      "笑不活了\n本来想试试，让 AI 去给我的手机号充话费，",
+      "然后 Cola 用我的手机号库库干，结果一分钱没花，在商城用 AI豆给我换了几块钱的话费🤣",
+      "后面我们把这个整理成 Skills ，发在了我们的社群里面",
+      "结果有用户薅到了 66 块的话费🤣，完全是意外之财",
+      "用 AI 去薅羊毛真的很爽哈哈哈哈，啥都不用干就薅上了"
+    ]
+  },
+  {
+    "id": "ai-writing-on-x",
+    "title": "我发现让 ai 写推特是真的抽象啊",
+    "platform": "x",
+    "format": "post",
+    "topic": "日常观察",
+    "excerpt": "试了几个版本，还是能一眼看出不是自己会说的话。",
+    "sourceUrl": "https://x.com/heran_ai/status/2109876678747193375",
+    "sourceAuthor": "Heran · @heran_ai",
+    "verifiedAt": "2026-11-14",
+    "bodyLabel": "帖子原文",
+    "paragraphs": [
+      "我发现让 ai 写推特是真的抽象啊",
+      "出了好几个版本，都是人机\n真的就是一坨",
+      "也不知道那些还在用 ai 回评论的人是咋想的"
+    ]
+  }
+]

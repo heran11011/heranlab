@@ -34,7 +34,8 @@ const imageURL = image ? new URL(image.src, Astro.site).href : undefined;
 	gtag('config', 'G-6K0DQ1M668');
 </script>
 
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<!-- 使用本人已公开的小红书头像；版本参数避免浏览器沿用旧 H 图标 -->
+<link rel="icon" type="image/webp" href="/social/xiaohongshu-avatar.webp?v=20261114" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link rel="alternate" type="application/rss+xml" title={BLOG_TITLE} href={new URL('rss.xml', Astro.site)} />
 <meta name="generator" content={Astro.generator} />
@@ -49,13 +50,13 @@ const imageURL = image ? new URL(image.src, Astro.site).href : undefined;
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
-<meta name="author" content="禾冉 Heran" />
+<meta name="author" content="禾冉 heran" />
 
 <meta property="og:type" content={type} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:site_name" content="禾冉 Heran" />
+<meta property="og:site_name" content="禾冉 heran" />
 {imageURL && <meta property="og:image" content={imageURL} />}
 
 <meta name="twitter:card" content={imageURL ? 'summary_large_image' : 'summary'} />

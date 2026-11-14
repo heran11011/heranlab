@@ -1,17 +1,16 @@
 ---
-import { getCollection } from 'astro:content';
 import Todo from '../components/Todo.astro';
 import AccountCards from '../components/AccountCards.astro';
 import WorkCard from '../components/WorkCard.astro';
 import { SITE_DESCRIPTION } from '../consts';
 import { profile } from '../data/profile';
-import { ymd } from '../lib/date';
+import { library, platformLabels } from '../data/library';
 import Base from '../layouts/Base.astro';
 import { getWorks } from '../lib/work';
 
 const works = await getWorks();
 const featured = works.filter((w) => w.data.featured).slice(0, 3);
-const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const selectedContent = library.filter((item) => item.featured).slice(0, 3);
 const h = profile.headline;
 ---
 
@@ -65,22 +64,23 @@ const h = profile.headline;
 	<section class="row" id="writing">
 		<header>
 			<h2>写的东西</h2>
-			<span class="mono">站内 {posts.length} 篇 · 其余在各平台</span>
+			<span class="mono">笔记 · 观察 · 视频</span>
+			<p class="content-intro">散落在各个平台的内容，<br />也在这里慢慢整理。</p>
+			<a class="btn" href="/content/">去看全部内容 →</a>
 		</header>
 		<div>
-			<ul class="posts">
-				{
-					posts.map((p) => (
-						<li>
-							<a href={`/blog/${p.id}/`} lang="en">
-								<span class="mono">{ymd(p.data.pubDate)}</span>
-								<h3>{p.data.title}</h3>
-								<span class="pill">EN</span>
-							</a>
-						</li>
-					))
-				}
-			</ul>
+			<ol class="home-content">
+				{selectedContent.map((item, i) => (
+					<li>
+						<a href={`/content/${item.id}/`}>
+							<span class="mono">0{i + 1} / {platformLabels[item.platform]} · {item.topic}</span>
+							<h3>{item.title}</h3>
+							<p>{item.excerpt}</p>
+							<span class="read">在这里读 →</span>
+						</a>
+					</li>
+				))}
+			</ol>
 			<AccountCards />
 		</div>
 	</section>
@@ -98,3 +98,16 @@ const h = profile.headline;
 		</div>
 	</section>
 </Base>
+
+<style>
+	.content-intro { color: var(--ink-2); font-size: 15px; margin: 18px 0 24px; }
+	.home-content { list-style: none; padding: 0; margin: 0 0 30px; }
+	.home-content li + li { border-top: 1px dashed var(--rule); }
+	.home-content a { display: block; padding: 22px 0; text-decoration: none; }
+	.home-content li:first-child a { padding-top: 0; }
+	.home-content h3 { font-family: var(--serif-zh); font-size: 24px; line-height: 1.4; font-weight: 400; margin: 7px 0; }
+	.home-content p { color: var(--ink-2); font-size: 15px; margin: 0; }
+	.home-content .read { display: inline-block; margin-top: 12px; color: var(--accent); font-size: 13px; }
+	.home-content a:hover h3 { text-decoration: underline; text-underline-offset: 5px; }
+	.home-content a:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+</style>
