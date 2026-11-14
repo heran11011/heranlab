@@ -5,46 +5,25 @@ import { profile } from '../data/profile';
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="关于" description={`关于禾冉（Heran）：${profile.experience[0].org}${profile.experience[0].role}，${profile.school.name}${profile.school.major} ${profile.school.grad}。`}>
+<Base title="关于" description="关于禾冉（heran）：做增长运营，也自己写工具。这里放作品、使用记录和公开联系方式。">
 	<section class="row first">
 		<header>
 			<h1>关于</h1>
-			<span class="mono">{profile.name} · {profile.nameEn} · {profile.realName}</span>
+			<span class="mono">{profile.name} · {profile.nameEn}</span>
 		</header>
 		<div class="prose" style="padding-top:0">
 			{profile.intro ? <p>{profile.intro}</p> : <p><Todo label="一段 100 字以内的自我介绍" where="关于页" /></p>}
 			<dl class="facts">
-				<div><dt>署名</dt><dd>{profile.name} / {profile.nameEn}（本名{profile.realName}）</dd></div>
-				<div><dt>在读</dt><dd>{profile.school.name} · {profile.school.major} · {profile.school.degree} {profile.school.grad}</dd></div>
-				<div><dt>在</dt><dd>{profile.city}</dd></div>
+				<div><dt>署名</dt><dd>{profile.name} / {profile.nameEn}</dd></div>
+				{profile.facts.map((f) => <div><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
 			</dl>
 		</div>
 	</section>
 
 	<section class="row">
 		<header>
-			<h2>工作</h2>
-			<span class="mono">实习</span>
-		</header>
-		<ol class="timeline">
-			{
-				profile.experience.map((e) => (
-					<li>
-						<span class="mono">{e.period}</span>
-						<div>
-							<h3>{e.org} · {e.role}</h3>
-							<p>{e.desc}</p>
-						</div>
-					</li>
-				))
-			}
-		</ol>
-	</section>
-
-	<section class="row">
-		<header>
-			<h2>时间线</h2>
-			<span class="mono">2025 → 2027</span>
+			<h2>作品进展</h2>
+			<span class="mono">做过的 · 在做的</span>
 		</header>
 		<ol class="timeline">
 			{

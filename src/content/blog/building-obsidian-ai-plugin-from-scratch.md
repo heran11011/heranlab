@@ -4,7 +4,7 @@ description: 'How I built obsidian-cola: an AI-powered sidebar chat plugin for O
 pubDate: 'Jun 28 2026'
 ---
 
-I'm a junior college student interning at an AI startup. I use Obsidian for notes, and I use Cola (an AI desktop agent) for everything else. One day I realized: every time I need AI help while writing, I have to switch windows, paste context, wait for a response, then copy it back.
+I use Obsidian for notes, and I use Cola (an AI desktop agent) for everything else. One day I realized: every time I need AI help while writing, I have to switch windows, paste context, wait for a response, then copy it back.
 
 That friction was annoying enough that I decided to build a plugin that puts Cola directly inside Obsidian's sidebar. What followed was a two-week sprint from zero to a working product submitted to both the Obsidian Community Plugins registry and the Cola Plugin Store.
 
@@ -213,4 +213,4 @@ The full source code is at [github.com/heran11011/obsidian-cola](https://github.
 
 ---
 
-*Written by Heran — a college junior building things with AI, one plugin at a time.*
+*Written by heran — building things with AI, one plugin at a time.*
