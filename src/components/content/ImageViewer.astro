@@ -1,0 +1,101 @@
+---
+interface Props {
+	src: string;
+	alt: string;
+	caption?: string;
+	videoUrl?: string;
+	videoLabel?: string;
+	width?: number;
+	height?: number;
+}
+const { src, alt, caption = '原文配图', videoUrl, videoLabel = '播放视频', width, height } = Astro.props;
+---
+
+<image-viewer class:list={[{ 'is-video': !!videoUrl }]}>
+	<figure>
+		<div class="image-preview">
+			<slot><img src={src} alt={alt} width={width} height={height} decoding="async" /></slot>
+			{!videoUrl && <button type="button" class="image-open" data-image-open hidden aria-label={`放大查看：${alt}`}><span class="sr-only">放大原图</span></button>}
+			{videoUrl && <a class="image-video-play" href={videoUrl} target="_blank" rel="noopener noreferrer"><span class="image-play-symbol" aria-hidden="true">▶</span><span>{videoLabel} ↗</span><span class="sr-only">（新窗口打开）</span></a>}
+		</div>
+		<figcaption><span>{caption}</span><button class="image-caption-open" type="button" data-image-open hidden>放大{videoUrl ? '封面' : '原图'} ↗</button><a data-image-original href={src} target="_blank" rel="noopener noreferrer">查看原图 <span aria-hidden="true">↗</span><span class="sr-only">（新窗口打开）</span></a></figcaption>
+	</figure>
+	<dialog data-image-dialog aria-label={`原图：${alt}`}>
+		<div class="image-dialog-sheet">
+			<button type="button" data-image-close autofocus aria-label="关闭原图">关闭 <span aria-hidden="true">×</span></button>
+			<img data-image-full data-src={src} alt={alt} decoding="async" />
+			<p>{caption} · <a href={src} target="_blank" rel="noopener noreferrer">打开原图 ↗<span class="sr-only">（新窗口打开）</span></a></p>
+		</div>
+	</dialog>
+</image-viewer>
+
+<script>
+	class ImageViewer extends HTMLElement {
+		private cleanup?: () => void;
+		connectedCallback() {
+			if (this.cleanup) return;
+			const buttons = [...this.querySelectorAll<HTMLButtonElement>('[data-image-open]')];
+			const open = buttons[0];
+			let opener = open;
+			const dialog = this.querySelector<HTMLDialogElement>('[data-image-dialog]');
+			const close = this.querySelector<HTMLButtonElement>('[data-image-close]');
+			const image = this.querySelector<HTMLImageElement>('[data-image-full]');
+			if (!open || !dialog || !close || !image || typeof dialog.showModal !== 'function') return;
+			const controller = new AbortController();
+			const { signal } = controller;
+			buttons.forEach((button) => button.addEventListener('click', () => {
+				opener = button;
+				if (!image.getAttribute('src')) image.src = image.dataset.src || '';
+				dialog.showModal();
+			}, { signal }));
+			close.addEventListener('click', () => dialog.close(), { signal });
+			// 原生 dialog 处理 Escape 与焦点限制；close 事件覆盖所有关闭方式。
+			dialog.addEventListener('close', () => opener.focus({ preventScroll: true }), { signal });
+			let startedOutside = false;
+			dialog.addEventListener('pointerdown', (event) => { startedOutside = event.target === dialog; }, { signal });
+			dialog.addEventListener('click', (event) => {
+				if (startedOutside && event.target === dialog) dialog.close();
+				startedOutside = false;
+			}, { signal });
+			buttons.forEach((button) => { button.hidden = false; });
+			const original = this.querySelector<HTMLElement>('[data-image-original]');
+			if (original) original.hidden = true;
+			this.cleanup = () => { if (dialog.open) dialog.close(); controller.abort(); };
+		}
+		disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined; }
+	}
+	if (!customElements.get('image-viewer')) customElements.define('image-viewer', ImageViewer);
+</script>
+
+<style>
+	image-viewer { display: block; min-width: 0; }
+	figure { margin: 0; }
+	.image-preview { position: relative; background: var(--reader-wash); }
+	.image-preview :global(img) { width: 100%; max-height: 420px; object-fit: contain; border: 0; border-radius: 0; }
+	.image-open { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: transparent; color: var(--reader-ink); cursor: zoom-in; }
+	.image-caption-open { min-height: 44px; min-width: 80px; padding: 8px; border: 0; background: transparent; color: var(--reader-accent); font: 11px var(--sans); cursor: zoom-in; }
+	.image-open[hidden], .image-caption-open[hidden], [data-image-original][hidden] { display: none; }
+	figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 12px; align-items: center; margin-top: 4px; color: var(--reader-muted); font: 11px/1.6 var(--mono); }
+	figcaption a { display: inline-flex; align-items: center; min-height: 44px; color: var(--reader-accent); text-decoration: none; }
+	figcaption a:hover { text-decoration: underline; text-underline-offset: 4px; }
+	.is-video .image-preview :global(img) { aspect-ratio: 16 / 9; max-height: 360px; }
+	.image-video-play { position: absolute; left: 16px; bottom: 16px; display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 10px 16px; color: var(--reader-paper); background: var(--reader-ink); font: 14px/1.5 var(--sans); text-decoration: none; }
+	.image-video-play:hover { background: var(--reader-accent); }
+	.image-play-symbol { font-size: 18px; }
+	dialog { position: fixed; inset: 0; margin: auto; padding: 16px; width: 100vw; max-width: none; height: 100dvh; max-height: none; border: 0; background: transparent; color: var(--reader-ink); overflow: auto; }
+	dialog::backdrop { background: rgba(17, 22, 18, 0.88); }
+	.image-dialog-sheet { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; padding: 60px 12px 12px; background: var(--reader-paper); }
+	.image-dialog-sheet img { max-width: 100%; max-height: calc(100dvh - 160px); width: auto; height: auto; margin-inline: auto; object-fit: contain; }
+	[data-image-close] { position: absolute; right: 12px; top: 8px; min-height: 44px; min-width: 72px; padding: 8px 12px; border: 1px solid var(--reader-rule); background: var(--reader-paper); color: var(--reader-ink); font: 14px var(--sans); cursor: pointer; }
+	.image-dialog-sheet p { margin: 12px 0 0; color: var(--reader-muted); font: 12px/1.6 var(--sans); }
+	.image-dialog-sheet a { display: inline-flex; min-height: 44px; align-items: center; color: var(--reader-accent); }
+	@media (max-width: 760px) {
+		.image-preview :global(img) { max-height: 190px; }
+		.is-video .image-preview :global(img) { max-height: 220px; }
+		.image-video-play { left: 10px; bottom: 10px; min-height: 44px; padding: 8px 12px; font-size: 12px; }
+		dialog { padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+	}
+	@media print {
+		.image-open, .image-caption-open, dialog { display: none !important; }
+	}
+</style>

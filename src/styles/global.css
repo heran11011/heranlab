@@ -10,7 +10,7 @@
 	--ink-2: #5f6058; /* 次要文字 */
 	--ink-3: #707064; /* 标签、日期：小字号仍需清楚可读 */
 	--rule: #dad5c7;
-	--accent: #2f4a8a; /* 钢笔蓝：链接、待补标记 */
+	--accent: #a24f35; /* 陶土色：像纸上的批注，而非产品导航 */
 	--marker: #f1e07a; /* 荧光笔：全站只用一两处 */
 
 	--serif-en: var(--font-instrument), Georgia, serif;
@@ -23,6 +23,8 @@
 	--r: 6px;
 	--avatar-radius: 16.6667%; /* 头像与页签统一为圆角方形 */
 	--top: 60px;
+	--spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--decel: cubic-bezier(0, 0, 0.2, 1);
 }
 
 /* 借鉴参考页的阅读配色：只换色彩角色，不改变内容与排版。 */
@@ -40,6 +42,7 @@
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top) + 16px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 .skip-link { position: fixed; top: 12px; left: 16px; z-index: 50; padding: 8px 14px; background: var(--paper-2); color: var(--ink); border: 1px solid var(--ink); border-radius: 4px; transform: translateY(-150%); }
 .skip-link:focus { transform: translateY(0); }
 main:focus { outline: none; }

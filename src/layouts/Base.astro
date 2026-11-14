@@ -39,7 +39,12 @@ const fullTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 					const text = b.dataset.copy || b.previousElementSibling?.textContent || '';
 					try {
 						await navigator.clipboard.writeText(text.trim());
-					} catch {}
+					} catch {
+						const old = b.textContent;
+						b.textContent = '请手动复制';
+						setTimeout(() => (b.textContent = old), 1400);
+						return;
+					}
 					const old = b.textContent;
 					b.textContent = '已复制';
 					setTimeout(() => (b.textContent = old), 1400);

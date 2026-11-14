@@ -10,6 +10,7 @@ const items = JSON.parse(await readFile(path.join(root, 'src/data/library.json')
 const privateTerms = ['学校', '学院', '学号', '毕业', '在读', '在校', 'IP属地', '仅自己可见', 'college student', 'college junior', 'interning at'];
 const origins = { xiaohongshu: 'www.xiaohongshu.com', x: 'x.com', bilibili: 'www.bilibili.com' };
 const ids = new Set();
+const unescapeHTML = (text) => text.replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replace(/&#(?:39|x27);/g, "'");
 assert.ok(items.length > 0, 'No verified content');
 for (const item of items) {
 	assert.match(item.id, /^[a-z0-9-]+$/, 'Unsafe content ID');
@@ -32,12 +33,20 @@ for (const item of items) {
 	const html = await readFile(path.join(root, `dist/content/${item.id}/index.html`), 'utf8');
 	assert.ok(html.includes(item.title), `Detail title missing: ${item.id}`);
 	assert.ok(html.includes(item.bodyLabel), `Source type missing: ${item.id}`);
+	assert.ok(html.includes('data-reader-body') && html.includes('<reader-preferences'), `Reader tools missing: ${item.id}`);
+	assert.ok(html.includes('data-reader-pagination'), `Continue-reading navigation missing: ${item.id}`);
+	assert.ok(unescapeHTML(html).includes(item.sourceUrl), `Source link missing: ${item.id}`);
+	const body = html.match(/<div\b[^>]*data-reader-body[^>]*>([\s\S]*?)<\/div>/)?.[1];
+	assert.ok(body, `Reading body missing: ${item.id}`);
+	for (const paragraph of item.paragraphs) assert.ok(unescapeHTML(body).includes(paragraph), `Original paragraph changed: ${item.id}`);
+	if (item.cover) assert.ok(html.includes('data-image-dialog') && html.includes('data-image-open'), `Image viewer missing: ${item.id}`);
 }
 const index = await readFile(path.join(root, 'dist/content/index.html'), 'utf8');
 for (const id of ids) assert.ok(index.includes(`/content/${id}/`), `Index link missing: ${id}`);
 for (const slug of ['best-ai-desktop-agents-2026', 'building-obsidian-ai-plugin-from-scratch']) {
 	assert.ok(index.includes(`/blog/${slug}/`), `Old article missing: ${slug}`);
-	await stat(path.join(root, `dist/blog/${slug}/index.html`));
+	const article = await readFile(path.join(root, `dist/blog/${slug}/index.html`), 'utf8');
+	assert.ok(article.includes('data-reader-body') && article.includes('<reader-preferences'), `Old article reader missing: ${slug}`);
 }
 
 async function checkGenerated(dir) {
@@ -80,10 +89,12 @@ assert.ok(globalCSS.includes('--avatar-radius: 16.6667%'), 'Avatar rounding must
 const homeHTML = await readFile(path.join(root, 'dist/index.html'), 'utf8');
 const home = homeHTML.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
 assert.ok(home, 'Homepage main missing');
+assert.ok(home.includes('data-paper-deck') && home.includes('data-chapter-tabs'), 'Personal desk interactions missing');
+for (const id of ids) assert.ok(home.includes(`/content/${id}/`), `Desk paper missing: ${id}`);
 assert.ok(home.includes('/content/dawdex-adventurex/'), 'Lead content missing on homepage');
 assert.ok(home.includes('/content/dawdex-video/'), 'Video content missing on homepage');
 assert.ok(home.includes('/content/early-video-regret/'), 'Second video missing on homepage');
 assert.ok((home.match(/<img\b/g) || []).length >= 5, 'Homepage has lost its image-led layout');
 assert.ok(!home.includes('截图待补') && !home.includes('照片待补'), 'Placeholder images must not lead the homepage');
 const checked = await checkGenerated(path.join(root, 'dist'));
-console.log(`PASS: image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);
+console.log(`PASS: personal desk, original paragraphs, reader tools and image viewer; image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);

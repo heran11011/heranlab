@@ -1,0 +1,142 @@
+---
+interface Props {
+	backHref?: string;
+	backLabel?: string;
+	nextHref?: string;
+	nextTitle?: string;
+}
+const { backHref = '/content/', backLabel = '返回内容', nextHref, nextTitle } = Astro.props;
+---
+
+<reader-preferences role="navigation" aria-label="阅读工具">
+	<a class="reader-return" href={backHref}><span aria-hidden="true">←</span> {backLabel}</a>
+	<details class="reader-size-menu">
+		<summary>字号 <span aria-hidden="true">⌄</span></summary>
+		<div class="reader-size-panel" role="group" aria-label="正文字号">
+			<span>让文字适合你的眼睛</span>
+			<div>
+				<button type="button" data-reader-size="small" aria-pressed="false">小</button>
+				<button type="button" data-reader-size="standard" aria-pressed="true">标准</button>
+				<button type="button" data-reader-size="large" aria-pressed="false">大</button>
+			</div>
+		</div>
+	</details>
+	<button class="reader-focus-toggle" type="button" data-reader-focus aria-pressed="false">专注</button>
+	{nextHref ? <a class="reader-next" href={nextHref} title={nextTitle}>下一篇 <span aria-hidden="true">→</span></a> : <a class="reader-next" href={backHref}>回目录 <span aria-hidden="true">↗</span></a>}
+</reader-preferences>
+
+<script>
+	class ReaderPreferences extends HTMLElement {
+		private cleanup?: () => void;
+		connectedCallback() {
+			if (this.cleanup) return;
+			const article = this.closest<HTMLElement>('article[data-reader-article]');
+			const menu = this.querySelector<HTMLDetailsElement>('details');
+			const summary = this.querySelector<HTMLElement>('summary');
+			const focus = this.querySelector<HTMLButtonElement>('[data-reader-focus]');
+			const sizes = [...this.querySelectorAll<HTMLButtonElement>('[data-reader-size]')];
+			if (!article || !menu || !summary || !focus) return;
+			const controller = new AbortController();
+			const { signal } = controller;
+			const read = (key: string) => { try { return localStorage.getItem(key); } catch { return null; } };
+			const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch {} };
+			const applySize = (value: string | null) => {
+				const size = value === 'small' || value === 'large' ? value : 'standard';
+				article.dataset.readerSize = size;
+				sizes.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.readerSize === size)));
+			};
+			const applyFocus = (value: string | null) => {
+				const focused = value === 'true';
+				article.dataset.focused = String(focused);
+				focus.setAttribute('aria-pressed', String(focused));
+				focus.textContent = focused ? '退出专注' : '专注';
+			};
+			applySize(read('heran-reader-size'));
+			applyFocus(read('heran-reader-focus'));
+			sizes.forEach((button) => button.addEventListener('click', () => {
+				const value = button.dataset.readerSize || 'standard';
+				applySize(value);
+				save('heran-reader-size', value);
+				menu.open = false;
+				summary.focus({ preventScroll: true });
+			}, { signal }));
+			focus.addEventListener('click', () => {
+				const value = String(article.dataset.focused !== 'true');
+				applyFocus(value);
+				save('heran-reader-focus', value);
+			}, { signal });
+			this.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); }
+			}, { signal });
+			document.addEventListener('pointerdown', (event) => {
+				if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+			}, { signal });
+			window.addEventListener('storage', (event) => {
+				if (event.key === 'heran-reader-size' || event.key === null) applySize(read('heran-reader-size'));
+				if (event.key === 'heran-reader-focus' || event.key === null) applyFocus(read('heran-reader-focus'));
+			}, { signal });
+			this.dataset.ready = 'true';
+			this.cleanup = () => controller.abort();
+		}
+		disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined; }
+	}
+	if (!customElements.get('reader-preferences')) customElements.define('reader-preferences', ReaderPreferences);
+</script>
+
+<style is:global>
+	/* 同一张纸：阅读角色引用全站 tokens，换肤时不出现另一套色块。 */
+	article[data-reader-article] {
+		--reader-paper: var(--paper); --reader-ink: var(--ink); --reader-muted: var(--ink-2);
+		--reader-accent: var(--accent); --reader-leaf: var(--ink-2); --reader-rule: var(--rule);
+		--reader-wash: var(--paper-3); --reader-font-size: 18px;
+		color: var(--reader-ink);
+	}
+	article[data-reader-article][data-reader-size='small'] { --reader-font-size: 16px; }
+	article[data-reader-article][data-reader-size='large'] { --reader-font-size: 21px; }
+	article[data-reader-article] [data-reader-body] {
+		max-width: 38em; min-width: 0; font-size: var(--reader-font-size); line-height: 1.95;
+		font-family: var(--serif-zh); overflow-wrap: anywhere;
+	}
+	article[data-reader-article][data-focused='true'] [data-reader-secondary] { display: none !important; }
+	article[data-reader-article] :is(a, button, summary):focus-visible {
+		outline: 2px solid var(--reader-accent); outline-offset: 4px;
+	}
+	reader-preferences {
+		display: none; position: sticky; top: var(--top, 60px); z-index: 9;
+		align-items: center; grid-template-columns: 1fr auto auto 1fr; gap: 8px;
+		padding: 6px 0; margin: 0 0 32px; background: var(--reader-paper);
+		border-block: 1px solid var(--reader-rule); font: 12px/1.4 var(--sans);
+	}
+	reader-preferences[data-ready='true'] { display: grid; }
+	reader-preferences :is(a, button, summary) {
+		display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+		min-width: 44px; min-height: 44px; padding: 8px 12px;
+		font: inherit; color: var(--reader-ink); border: 0; background: transparent;
+		text-decoration: none; cursor: pointer; border-radius: 2px; white-space: nowrap;
+	}
+	reader-preferences :is(a, button, summary):hover { background: var(--reader-wash); }
+	reader-preferences .reader-return { justify-self: start; }
+	reader-preferences .reader-next { justify-self: end; }
+	reader-preferences .reader-size-menu { position: static; }
+	reader-preferences summary { list-style: none; }
+	reader-preferences summary::-webkit-details-marker { display: none; }
+	reader-preferences [aria-pressed='true'] { color: var(--reader-accent); background: var(--reader-wash); }
+	reader-preferences .reader-size-panel {
+		position: absolute; right: 0; top: calc(100% + 6px); width: min(260px, 100%);
+		padding: 16px; background: var(--reader-paper); border: 1px solid var(--reader-rule);
+		box-shadow: 0 8px 20px color-mix(in srgb, var(--reader-ink) 10%, transparent);
+	}
+	reader-preferences .reader-size-panel > span { color: var(--reader-muted); }
+	reader-preferences .reader-size-panel > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 10px; }
+	@media (max-width: 600px) {
+		article[data-reader-article] { --reader-font-size: 17px; }
+		article[data-reader-article][data-reader-size='small'] { --reader-font-size: 15px; }
+		article[data-reader-article][data-reader-size='large'] { --reader-font-size: 20px; }
+		reader-preferences { gap: 2px; margin-bottom: 24px; padding-inline: env(safe-area-inset-left) env(safe-area-inset-right); }
+		reader-preferences :is(a, button, summary) { gap: 3px; padding-inline: 6px; }
+	}
+	@media print {
+		reader-preferences { display: none !important; }
+		article[data-reader-article][data-focused='true'] [data-reader-secondary] { display: block !important; }
+	}
+</style>

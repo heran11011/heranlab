@@ -16,15 +16,24 @@ npm run check:content
 
 ## 首页与阅读交互
 
-首页先展示真实图文精选和横向视频放映架，再放工具作品、介绍与联系方式；无公开封面的内容仅用文字，不伪造图片。
+首页是一张个人书桌：署名和头像、可按主题翻动的真实内容纸签，再接图文精选、视频放映架、工具与联系方式。手机纸签默认收起，留出首屏给内容；桌面展开。无公开封面的内容仅用文字，不伪造图片。
 
-- `src/components/home/`：图文条目与视频横滑，主题筛选、键盘翻动与 reduced motion。
+- `src/components/home/`：个人署名、内容纸签、章节导航、图文条目与视频横滑。原生按钮和链接支持键盘；动效遵守 reduced motion。
 - `src/lib/home.ts`：主题分类及已核验封面的尺寸/放行范围。
 - `src/components/ThemePicker.astro`：暖纸、森林、夜色；本地保存阅读配色，跨页面恢复。
 - `src/components/ReadingTools.astro`：按实际滚动更新进度、回到顶部，不持续运行动画循环。
 - `public/social/avatar-soft-square.png`：本人授权的原头像圆角方形透明裁切；圆角为边长的 1/6，与站内头像一致，未重新画人物。
 
-交互参考本地 Delicacy HTML 的换肤、横滑与阅读提示，仅借形式，不搬参考文件中的人物资料、项目文案或花丛画布。无 JavaScript 时核心内容与视频横滑仍可读，非功能控件隐藏。
+交互参考本地 Delicacy HTML 的大字、边注、留白、轻弹性、换肤和横滑，仅借形式，不搬参考文件中的人物资料、项目文案或花丛画布。无 JavaScript 时第一张纸签与全部图文仍可读，章节锚点、视频横滑和原图链接可用，非功能控件隐藏。
+
+## 阅读页
+
+- `src/components/content/ReaderPreferences.astro`：小／标准／大字号、专注模式、返回与下一篇，操作条随阅读停在顶栏下面。字号与专注状态只保存在本机 `localStorage`，禁用存储时仍能使用。
+- `src/components/content/ImageViewer.astro`：缩略图 + 原生 `dialog` 查看原图，关闭、Escape、空白处关闭与焦点返回；手机按钮至少 44 px，无 JavaScript 时提供原图链接。
+- `src/pages/content/[...slug].astro`：笔记左文右图、短帖保持短、视频封面和播放入口优先；手机单列。原文不重写，来源与核对日期保留在折叠记录里，前后篇导航不伪装成时间排序。
+- `src/layouts/BlogPost.astro`：两篇旧文章共用阅读工具，保留原文和旧 URL。
+
+`check:content` 除隐私与链接外，也逐段核对原文未改动、阅读工具／图片查看器存在、纸签和头像一致性。
 
 ## 内容与来源
 

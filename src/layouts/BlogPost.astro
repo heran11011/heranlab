@@ -1,24 +1,104 @@
 ---
-// 英文博客文章页。lang="en"，正文原样不动
+// 英文博客文章页。lang="en"，正文原样不动。
 import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
+import ImageViewer from '../components/content/ImageViewer.astro';
+import ReaderPreferences from '../components/content/ReaderPreferences.astro';
 import Base from './Base.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const currentPath = decodeURIComponent(Astro.url.pathname).replace(/\/$/, '');
+const index = posts.findIndex((post) => `/blog/${post.id}` === currentPath);
+const previous = index >= 0 ? posts[index - 1] : undefined;
+const next = index >= 0 ? posts[index + 1] : undefined;
 ---
 
 <Base title={title} description={description} lang="en" image={heroImage} type="article">
-	<article class="post">
+	<article class="post reader-post" data-reader-article data-focused="false">
+		<nav class="post-back" aria-label="文章目录"><a href="/blog/">← 返回文章</a><span>禾冉的文章 / heran</span></nav>
 		<header class="post-head">
-			<a class="mono" href="/blog/" style="text-decoration:none">← 文章</a>
-			<span class="mono"> · <FormattedDate date={pubDate} />{updatedDate && <> · updated <FormattedDate date={updatedDate} /></>}</span>
+			<p class="post-eyebrow"><span aria-hidden="true">/</span> Article · heran</p>
 			<h1>{title}</h1>
+			<p class="post-description" data-reader-secondary>{description}</p>
 		</header>
-		{heroImage && <div class="post-hero"><Image width={1180} height={590} src={heroImage} alt="" loading="eager" /></div>}
-		<div class="prose">
-			<slot />
+		<ReaderPreferences backHref="/blog/" backLabel="返回文章" nextHref={next && `/blog/${next.id}/`} nextTitle={next?.data.title} />
+		<div class="post-reading-layout">
+			<div class="post-main">
+				{heroImage && <div class="post-hero"><ImageViewer src={heroImage.src} alt={title} caption="文章配图"><Image width={1180} height={590} src={heroImage} alt={title} loading="eager" /></ImageViewer></div>}
+				<div class="prose" data-reader-body>
+					<slot />
+				</div>
+				<footer class="post-colophon"><span>Written by heran</span><a href="/blog/">回到文章目录 ↗</a></footer>
+			</div>
+			<aside class="post-margin-note" aria-label="文章小注" data-reader-secondary>
+				<p>页边小注 / Article</p>
+				<dl>
+					<div><dt>作者 / Author</dt><dd>禾冉 / heran</dd></div>
+					<div><dt>发布 / Published</dt><dd><FormattedDate date={pubDate} /></dd></div>
+					{updatedDate && <div><dt>更新 / Updated</dt><dd><FormattedDate date={updatedDate} /></dd></div>}
+				</dl>
+			</aside>
 		</div>
+		{(previous || next) && <nav class="post-pagination" aria-label="继续阅读" data-reader-pagination>
+			{previous && <a href={`/blog/${previous.id}/`} rel="prev"><span>← 上一篇</span><strong>{previous.data.title}</strong></a>}
+			{next && <a href={`/blog/${next.id}/`} rel="next"><span>下一篇 →</span><strong>{next.data.title}</strong></a>}
+		</nav>}
 	</article>
 </Base>
+
+<style>
+	.reader-post { padding: 28px clamp(0px, 2vw, 24px) max(64px, env(safe-area-inset-bottom)); }
+	.post-back { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--reader-rule); }
+	.post-back a { display: inline-flex; align-items: center; min-height: 44px; font-size: 12px; color: var(--reader-accent); text-decoration: none; }
+	.post-back > span { font: 11px var(--mono); color: var(--reader-muted); }
+	.reader-post .post-head { max-width: 950px; padding: 40px 0 32px; }
+	.post-eyebrow { margin: 0 0 20px; color: var(--reader-leaf); font: 11px var(--mono); }
+	.post-eyebrow > span { margin-right: 10px; color: var(--reader-accent); }
+	.reader-post .post-head h1 { margin: 0; font-size: clamp(38px, 5.5vw, 70px); line-height: 1.08; font-weight: 400; text-wrap: pretty; }
+	.post-description { max-width: 38em; margin: 24px 0 0; font: 18px/1.75 var(--serif-en); color: var(--reader-muted); }
+	.post-reading-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 240px); gap: clamp(32px, 5vw, 68px); align-items: start; }
+	.post-main { min-width: 0; max-width: 798px; }
+	.reader-post .post-hero { margin: 0 0 28px; }
+	.reader-post .prose { padding: 0; counter-reset: reader-chapter; }
+	.reader-post .prose :global(h2) { counter-increment: reader-chapter; position: relative; margin: 2em 0 0.7em; color: var(--reader-ink); font: 400 1.7em/1.25 var(--serif-en); }
+	.reader-post .prose :global(h2::before) { content: counter(reader-chapter, decimal-leading-zero) " /"; display: block; margin-bottom: 10px; font: 11px/1.6 var(--mono); color: var(--reader-accent); }
+	.reader-post .prose :global(h3) { color: var(--reader-ink); font: 400 1.3em/1.4 var(--serif-en); }
+	.reader-post .prose :global(a) { color: var(--reader-accent); }
+	.reader-post .prose :global(blockquote) { border-color: var(--reader-leaf); color: var(--reader-muted); }
+	.reader-post .prose :global(pre), .reader-post .prose :global(code) { background: var(--reader-wash); }
+	.reader-post .prose :global(pre) { max-width: 100%; border-color: var(--reader-rule); }
+	.reader-post .prose :global(pre code) { background: none; }
+	.reader-post .prose :global(hr), .reader-post .prose :global(th), .reader-post .prose :global(td) { border-color: var(--reader-rule); }
+	.reader-post .prose :global(img) { border: 0; border-radius: 0; }
+	.reader-post .prose :global(ol li::marker) { color: var(--reader-muted); }
+	.post-margin-note { position: sticky; top: calc(var(--top, 60px) + 88px); padding-left: 18px; border-left: 2px solid var(--reader-leaf); color: var(--reader-muted); }
+	.post-margin-note > p { margin: 0 0 20px; font: 10px/1.7 var(--mono); color: var(--reader-leaf); }
+	.post-margin-note dl { margin: 0; }
+	.post-margin-note dl > div + div { margin-top: 18px; }
+	.post-margin-note dt { font: 10px/1.8 var(--mono); }
+	.post-margin-note dd { margin: 4px 0 0; font: 16px/1.6 var(--serif-en); color: var(--reader-ink); }
+	.post-colophon { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 32px; border-top: 1px solid var(--reader-rule); padding-top: 16px; font: 12px/1.7 var(--mono); color: var(--reader-muted); }
+	.post-colophon a { display: inline-flex; align-items: center; min-height: 44px; color: var(--reader-accent); text-underline-offset: 5px; }
+	.post-pagination { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--reader-rule); }
+	.post-pagination a { display: block; min-height: 88px; padding: 12px 0; text-decoration: none; }
+	.post-pagination a > span { font: 11px/1.8 var(--mono); color: var(--reader-accent); }
+	.post-pagination strong { display: block; margin-top: 8px; font: 400 25px/1.3 var(--serif-en); }
+	.post-pagination a:hover strong { text-decoration: underline; text-underline-offset: 5px; }
+	.reader-post[data-focused='true'] .post-head, .reader-post[data-focused='true'] .post-reading-layout { max-width: 798px; margin-inline: auto; }
+	.reader-post[data-focused='true'] .post-reading-layout { grid-template-columns: minmax(0, 1fr); }
+	@media (max-width: 760px) {
+		.reader-post { padding: 20px 0 max(48px, env(safe-area-inset-bottom)); }
+		.reader-post .post-head { padding: 28px 0 24px; }
+		.reader-post .post-head h1 { font-size: clamp(36px, 7vw, 48px); }
+		.post-description { margin-top: 18px; font-size: 17px; }
+		.post-reading-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+		.post-margin-note { position: static; }
+		.post-margin-note dl { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+		.post-margin-note dl > div + div { margin-top: 0; }
+		.post-pagination { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 32px; }
+		.post-pagination a + a { border-top: 1px solid var(--reader-rule); }
+	}
+</style>
