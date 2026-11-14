@@ -1,44 +1,116 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getCollection } from 'astro:content';
-import FormattedDate from '../components/FormattedDate.astro';
+import Todo from '../components/Todo.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { SITE_DESCRIPTION } from '../consts';
+import { profile } from '../data/profile';
+import { ymd } from '../lib/date';
+import Base from '../layouts/Base.astro';
+import { getWorks } from '../lib/work';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const works = await getWorks();
+const featured = works.filter((w) => w.data.featured).slice(0, 3);
+const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const h = profile.headline;
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<h1>HeranLab</h1>
-				<p>Honest reviews and comparisons of AI tools. No hype, just what works.</p>
-			</section>
-			<section>
-				<h2>Latest Posts</h2>
-				<ul style="list-style: none; padding: 0;">
-					{posts.map((post) => (
-						<li style="margin-bottom: 1.5rem;">
-							<a href={`/blog/${post.id}/`}>
-								<h3 style="margin: 0;">{post.data.title}</h3>
+<Base description={SITE_DESCRIPTION}>
+	<section class="hero">
+		<aside class="note rise d1">
+			<span class="mono">NO.00 · 自我介绍</span>
+			<h1>
+				{h.before}{h.br && <br />}{h.mid}<span class="hl">{h.hl}</span>{h.after}{h.todo && <Todo label={h.todo} where="首页 · 首屏那句话" />}
+			</h1>
+			<dl class="facts">
+				{profile.facts.map((f) => <div><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
+			</dl>
+			<div class="btns">
+				<a class="btn solid" href="/work/">看作品 →</a>
+				<a class="btn" href="#contact">联系我</a>
+			</div>
+		</aside>
+
+		<div>
+			<div class="sec-head rise d2">
+				<h2>精选作品</h2>
+				<a href="/work/">全部作品 →</a>
+			</div>
+			<div class="works">
+				{featured.map((w, i) => <WorkCard work={w} index={i + 1} wide={w.data.wide} class={`rise d${Math.min(i + 2, 4)}`} />)}
+			</div>
+		</div>
+	</section>
+
+	<section class="row">
+		<header>
+			<h2>经历</h2>
+			<span class="mono">2025 → 2027</span>
+		</header>
+		<ol class="timeline">
+			{
+				profile.timeline.map((t) => (
+					<li>
+						<span class="mono">{t.when}</span>
+						<div>
+							<h3>{'href' in t && t.href ? <a href={t.href}>{t.title}</a> : t.title}</h3>
+							<p>{t.desc}</p>
+						</div>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
+	<section class="row" id="writing">
+		<header>
+			<h2>写的东西</h2>
+			<span class="mono">站内 {posts.length} 篇 · 其余在各平台</span>
+		</header>
+		<div>
+			<ul class="posts">
+				{
+					posts.map((p) => (
+						<li>
+							<a href={`/blog/${p.id}/`} lang="en">
+								<span class="mono">{ymd(p.data.pubDate)}</span>
+								<h3>{p.data.title}</h3>
+								<span class="pill">EN</span>
 							</a>
-							<p style="margin: 0.25rem 0; opacity: 0.7;">
-								<FormattedDate date={post.data.pubDate} /> — {post.data.description}
-							</p>
 						</li>
-					))}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+					))
+				}
+			</ul>
+			<div class="platforms">
+				{
+					profile.platforms.map((p) =>
+						p.href ? (
+							<a href={p.href} target="_blank" rel="noopener">
+								<span class="mono">{p.label}</span>
+								{p.name} ↗
+							</a>
+						) : (
+							<div>
+								<span class="mono">{p.label}</span>
+								{p.name}
+								{p.todo && <Todo label={p.todo} where={`平台 ${p.label}`} />}
+							</div>
+						),
+					)
+				}
+			</div>
+		</div>
+	</section>
+
+	<section class="row" id="contact">
+		<header>
+			<h2>联系</h2>
+			<span class="mono">邮件最快</span>
+		</header>
+		<div>
+			<div class="mail">
+				<a href={`mailto:${profile.email}`}>{profile.email}</a>
+				<button class="copy" type="button" data-copy={profile.email}>复制</button>
+			</div>
+		</div>
+	</section>
+</Base>

@@ -1,0 +1,20 @@
+---
+// 截图位：有图显示图，没图显示斜线占位 + “xx 待补”
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { noteTodo } from '../lib/checks';
+
+interface Props {
+	src?: ImageMetadata;
+	alt?: string;
+	placeholder?: string;
+	where?: string;
+	eager?: boolean;
+}
+const { src, alt = '', placeholder = '截图待补', where = Astro.url.pathname, eager = false } = Astro.props;
+if (!src) noteTodo(where, placeholder);
+---
+
+<div class="shot">
+	{src ? <Image src={src} alt={alt} width={1200} loading={eager ? 'eager' : 'lazy'} /> : <span>{placeholder}</span>}
+</div>

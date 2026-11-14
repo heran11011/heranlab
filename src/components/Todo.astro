@@ -1,0 +1,13 @@
+---
+// 页面上的“待补”标记；同时在构建日志里登记一条
+import { noteTodo } from '../lib/checks';
+
+interface Props {
+	label?: string;
+	where?: string;
+}
+const { label = '待补', where = Astro.url.pathname } = Astro.props;
+noteTodo(where, label);
+---
+
+<span class="todo">{label}</span>

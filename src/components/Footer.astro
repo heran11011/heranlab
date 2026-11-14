@@ -1,11 +1,13 @@
-<footer>
-	&copy; 2026 HeranLab. Built with honest opinions and real data.
+---
+import { profile } from '../data/profile';
+import { ymd } from '../lib/date';
+
+const updated = ymd(new Date());
+---
+
+<footer class="foot">
+	<div class="wrap">
+		<span class="mono">© {new Date().getFullYear()} {profile.name} {profile.nameEn.toUpperCase()} · <a href={`mailto:${profile.email}`}>{profile.email}</a></span>
+		<span class="mono">最后更新 {updated} · <a href="/rss.xml">RSS</a></span>
+	</div>
 </footer>
-<style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
-	}
-</style>

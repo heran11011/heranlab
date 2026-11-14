@@ -1,0 +1,99 @@
+---
+import { type CollectionEntry, render } from 'astro:content';
+import Shot from '../../components/Shot.astro';
+import Todo from '../../components/Todo.astro';
+import Base from '../../layouts/Base.astro';
+import { checkSources } from '../../lib/checks';
+import { GROUPS, getWorks } from '../../lib/work';
+
+export async function getStaticPaths() {
+	const works = await getWorks();
+	return works.map((work, i) => {
+		const d = work.data;
+		const text = [d.summary, ...d.meta.map((m) => m.v), d.command?.text ?? '', work.body ?? ''].join('\n');
+		checkSources(work.id, text, d.sources);
+		return {
+			params: { slug: work.id },
+			props: { work, index: i + 1, prev: works[i - 1], next: works[i + 1] },
+		};
+	});
+}
+
+interface Props {
+	work: CollectionEntry<'work'>;
+	index: number;
+	prev?: CollectionEntry<'work'>;
+	next?: CollectionEntry<'work'>;
+}
+const { work, index, prev, next } = Astro.props;
+const d = work.data;
+const where = `作品 ${work.id}`;
+const { Content } = await render(work);
+const isExternal = (href: string) => href.startsWith('http');
+---
+
+<Base title={d.title} description={d.summary} image={d.cover} type="article">
+	<div class="crumb mono rise d1"><a href="/work/">作品</a> / {String(index).padStart(2, '0')}</div>
+
+	<section class="w-head">
+		<div class="rise d1">
+			<span class="mono">{GROUPS[d.group]} · {d.kind}</span>
+			<h1 class:list={{ zh: d.titleLang === 'zh' }}>{d.title}{d.titleTodo && <Todo label={d.titleTodo} where={where} />}</h1>
+			<p class="lead">{d.summary}</p>
+		</div>
+		<dl class="meta rise d2">
+			{d.meta.map((m) => <div><dt>{m.k}</dt><dd>{m.v}{m.todo && <Todo label={m.todo} where={`${where} · ${m.k}`} />}</dd></div>)}
+		</dl>
+	</section>
+
+	{
+		d.shots.length > 0 && (
+			<section class="shots rise d3">
+				{d.shots.map((s, i) => (
+					<figure>
+						<Shot src={s.src} alt={s.caption} placeholder={`截图 ${i + 1} 待补：${s.caption}`} where={where} eager={i === 0} />
+						{s.src && <figcaption class="mono">{s.caption}</figcaption>}
+					</figure>
+				))}
+			</section>
+		)
+	}
+
+	<article class="prose">
+		<Content />
+		{d.bodyTodo && <p><Todo label={d.bodyTodo} where={where} /></p>}
+
+		{
+			d.command && (
+				<>
+					<h2>安装</h2>
+					<div class="cmd">
+						<code>{d.command.text}</code>
+						<button class="copy" type="button">复制</button>
+					</div>
+					{d.command.todo && <p><Todo label={d.command.todo} where={`${where} · 安装命令`} /></p>}
+				</>
+			)
+		}
+
+		{
+			d.links.length > 0 && (
+				<>
+					<h2>链接</h2>
+					<div class="links">
+						{d.links.map((l, i) => (
+							<a class:list={['btn', { solid: i === 0 }]} href={l.href} target={isExternal(l.href) ? '_blank' : undefined} rel={isExternal(l.href) ? 'noopener' : undefined}>
+								{l.label} {isExternal(l.href) ? '↗' : '→'}
+							</a>
+						))}
+					</div>
+				</>
+			)
+		}
+	</article>
+
+	<nav class="pager" aria-label="上一个 / 下一个作品">
+		{prev ? <a href={`/work/${prev.id}/`}><span class="mono">← 上一个</span><b>{prev.data.title}</b></a> : <a href="/work/"><span class="mono">← 返回</span><b>全部作品</b></a>}
+		{next && <a class="next" href={`/work/${next.id}/`}><span class="mono">下一个 →</span><b>{next.data.title}</b></a>}
+	</nav>
+</Base>

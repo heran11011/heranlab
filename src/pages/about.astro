@@ -1,25 +1,95 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+import Todo from '../components/Todo.astro';
+import { profile } from '../data/profile';
+import Base from '../layouts/Base.astro';
 ---
 
-<Layout
-	title="About"
-	description="Hi, I'm Heran. I review AI tools and share what actually works."
-	pubDate={new Date('May 23 2026')}
->
-	<p>
-		Hey, I'm Heran — a builder and AI tools enthusiast. I spend my days testing desktop AI agents, workflow automation tools, and productivity software so you don't have to wade through marketing hype.
-	</p>
+<Base title="关于" description={`关于禾冉（Heran）：${profile.experience[0].org}${profile.experience[0].role}，${profile.school.name}${profile.school.major} ${profile.school.grad}。`}>
+	<section class="row first">
+		<header>
+			<h1>关于</h1>
+			<span class="mono">{profile.name} · {profile.nameEn} · {profile.realName}</span>
+		</header>
+		<div class="prose" style="padding-top:0">
+			{profile.intro ? <p>{profile.intro}</p> : <p><Todo label="一段 100 字以内的自我介绍" where="关于页" /></p>}
+			<dl class="facts">
+				<div><dt>署名</dt><dd>{profile.name} / {profile.nameEn}（本名{profile.realName}）</dd></div>
+				<div><dt>在读</dt><dd>{profile.school.name} · {profile.school.major} · {profile.school.degree} {profile.school.grad}</dd></div>
+				<div><dt>在</dt><dd>{profile.city}</dd></div>
+			</dl>
+		</div>
+	</section>
 
-	<p>
-		Every review on this site comes from hands-on testing. I look at real performance data, actual user workflows, and honest trade-offs. No sponsored rankings, no affiliate-driven recommendations.
-	</p>
+	<section class="row">
+		<header>
+			<h2>工作</h2>
+			<span class="mono">实习</span>
+		</header>
+		<ol class="timeline">
+			{
+				profile.experience.map((e) => (
+					<li>
+						<span class="mono">{e.period}</span>
+						<div>
+							<h3>{e.org} · {e.role}</h3>
+							<p>{e.desc}</p>
+						</div>
+					</li>
+				))
+			}
+		</ol>
+	</section>
 
-	<p>
-		If you're looking for straightforward takes on AI tools that respect your time, you're in the right place.
-	</p>
+	<section class="row">
+		<header>
+			<h2>时间线</h2>
+			<span class="mono">2025 → 2027</span>
+		</header>
+		<ol class="timeline">
+			{
+				profile.timeline.map((t) => (
+					<li>
+						<span class="mono">{t.when}</span>
+						<div>
+							<h3>{'href' in t && t.href ? <a href={t.href}>{t.title}</a> : t.title}</h3>
+							<p>{t.desc}</p>
+						</div>
+					</li>
+				))
+			}
+		</ol>
+	</section>
 
-	<p>
-		Got a tool you want me to review? Reach out at heran11011@gmail.com.
-	</p>
-</Layout>
+	<section class="row">
+		<header>
+			<h2>会做的事</h2>
+		</header>
+		<ul class="tags">
+			{profile.skills.map((s) => <li>{s}</li>)}
+		</ul>
+	</section>
+
+	<section class="row" id="contact">
+		<header>
+			<h2>联系</h2>
+			<span class="mono">邮件最快</span>
+		</header>
+		<div>
+			<div class="mail">
+				<a href={`mailto:${profile.email}`}>{profile.email}</a>
+				<button class="copy" type="button" data-copy={profile.email}>复制</button>
+			</div>
+			<div class="platforms" style="margin-top:28px">
+				{
+					profile.platforms.map((p) =>
+						p.href ? (
+							<a href={p.href} target="_blank" rel="noopener"><span class="mono">{p.label}</span>{p.name} ↗</a>
+						) : (
+							<div><span class="mono">{p.label}</span>{p.name}{p.todo && <Todo label={p.todo} where={`平台 ${p.label}`} />}</div>
+						),
+					)
+				}
+			</div>
+		</div>
+	</section>
+</Base>

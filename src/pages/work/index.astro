@@ -1,0 +1,36 @@
+---
+import WorkCard from '../../components/WorkCard.astro';
+import Base from '../../layouts/Base.astro';
+import { GROUPS, getWorks } from '../../lib/work';
+
+const works = await getWorks();
+const groups = (Object.keys(GROUPS) as (keyof typeof GROUPS)[])
+	.map((g) => ({ key: g, label: GROUPS[g], items: works.filter((w) => w.data.group === g) }))
+	.filter((g) => g.items.length > 0);
+---
+
+<Base title="作品" description="禾冉做过的东西：自己写的工具、硬件与物联网项目。">
+	<section class="row first">
+		<header>
+			<h1>作品</h1>
+			<span class="mono">{works.length} 个 · 按类型分</span>
+		</header>
+		<div>
+			{
+				groups.map((g) => (
+					<section class="group">
+						<div class="sec-head">
+							<h2>{g.label}</h2>
+							<span class="mono">{g.items.length}</span>
+						</div>
+						<div class="works">
+							{g.items.map((w) => (
+								<WorkCard work={w} index={works.indexOf(w) + 1} />
+							))}
+						</div>
+					</section>
+				))
+			}
+		</div>
+	</section>
+</Base>
