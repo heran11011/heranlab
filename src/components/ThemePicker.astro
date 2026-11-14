@@ -1,0 +1,72 @@
+<site-theme>
+	<details class="tone-picker">
+		<summary aria-label="选择阅读配色"><span aria-hidden="true" class="tone-swatch"></span><span>配色</span></summary>
+		<div class="tone-panel" role="group" aria-label="阅读配色">
+			<p>同一册，不同光线。</p>
+			<button type="button" data-tone="paper" aria-pressed="true"><i class="paper" aria-hidden="true"></i>暖纸</button>
+			<button type="button" data-tone="forest" aria-pressed="false"><i class="forest" aria-hidden="true"></i>森林</button>
+			<button type="button" data-tone="night" aria-pressed="false"><i class="night" aria-hidden="true"></i>夜色</button>
+		</div>
+	</details>
+</site-theme>
+
+<script>
+	class SiteTheme extends HTMLElement {
+		private cleanup?: () => void;
+		connectedCallback() {
+			if (this.cleanup) return;
+			const menu = this.querySelector<HTMLDetailsElement>('details');
+			const summary = this.querySelector<HTMLElement>('summary');
+			const buttons = [...this.querySelectorAll<HTMLButtonElement>('button[data-tone]')];
+			if (!menu || !summary) return;
+			const controller = new AbortController();
+			const { signal } = controller;
+			const colors: Record<string, string> = { paper: '#f5f2e9', forest: '#eff3eb', night: '#1c211d' };
+			const apply = (tone: string, save = false) => {
+				if (!(tone in colors)) tone = 'paper';
+				document.documentElement.dataset.tone = tone;
+				buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.tone === tone)));
+				document.querySelector('meta[name="theme-color"]')?.setAttribute('content', colors[tone]);
+				if (save) {
+					try { localStorage.setItem('heran-tone', tone); } catch {}
+				}
+			};
+			apply(document.documentElement.dataset.tone || 'paper');
+			buttons.forEach((button) => button.addEventListener('click', () => {
+				apply(button.dataset.tone || 'paper', true);
+				menu.open = false;
+				summary.focus();
+			}, { signal }));
+			this.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); }
+			}, { signal });
+			document.addEventListener('pointerdown', (event) => {
+				if (event.target instanceof Node && !this.contains(event.target)) menu.open = false;
+			}, { signal });
+			window.addEventListener('storage', (event) => {
+				if (event.key === 'heran-tone') apply(event.newValue || 'paper');
+			}, { signal });
+			this.dataset.ready = 'true';
+			this.cleanup = () => controller.abort();
+		}
+		disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined; }
+	}
+	if (!customElements.get('site-theme')) customElements.define('site-theme', SiteTheme);
+</script>
+
+<style>
+	site-theme { display: none; flex: none; }
+	site-theme[data-ready] { display: block; }
+	.tone-picker { position: relative; font-size: 12px; }
+	.tone-picker summary { display: flex; align-items: center; gap: 7px; min-height: 40px; cursor: pointer; list-style: none; color: var(--ink-2); }
+	.tone-picker summary::-webkit-details-marker { display: none; }
+	.tone-swatch { width: 15px; height: 15px; border: 1px solid var(--ink-2); border-radius: 50%; background: var(--paper-3); }
+	.tone-picker summary:focus-visible, .tone-panel button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+	.tone-panel { position: absolute; right: 0; top: calc(100% + 9px); width: 160px; padding: 14px; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper-2); box-shadow: 0 12px 30px #00000012; }
+	.tone-panel p { font-size: 11px; margin: 0 0 8px; color: var(--ink-2); }
+	.tone-panel button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 6px 9px; text-align: left; border: 0; background: transparent; color: var(--ink); border-radius: 5px; cursor: pointer; font: 13px var(--sans); }
+	.tone-panel button[aria-pressed='true'] { background: var(--paper-3); }
+	.tone-panel button:hover { background: var(--paper-3); }
+	.tone-panel i { display: block; width: 17px; height: 17px; border-radius: 50%; border: 1px solid #00000020; }
+	.paper { background: #f5f2e9; } .forest { background: #d8e3ce; } .night { background: #1c211d; }
+</style>

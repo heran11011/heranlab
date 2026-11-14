@@ -1,0 +1,49 @@
+<reading-tools>
+	<div class="reading-progress" aria-hidden="true"><span></span></div>
+	<button class="back-to-top" type="button" aria-label="回到顶部" hidden>↑</button>
+</reading-tools>
+
+<script>
+	class ReadingTools extends HTMLElement {
+		private cleanup?: () => void;
+		connectedCallback() {
+			if (this.cleanup) return;
+			const line = this.querySelector<HTMLElement>('.reading-progress span');
+			const button = this.querySelector<HTMLButtonElement>('button');
+			if (!line || !button) return;
+			const controller = new AbortController();
+			const { signal } = controller;
+			let frame = 0;
+			const update = () => {
+				frame = 0;
+				const max = document.documentElement.scrollHeight - innerHeight;
+				const amount = max > 0 ? Math.max(0, Math.min(1, scrollY / max)) : 0;
+				line.style.transform = `scaleX(${amount})`;
+				button.hidden = scrollY < Math.max(500, innerHeight * 0.7);
+			};
+			const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+			window.addEventListener('scroll', schedule, { passive: true, signal });
+			window.addEventListener('resize', schedule, { passive: true, signal });
+			const observer = new ResizeObserver(schedule);
+			observer.observe(document.body);
+			button.addEventListener('click', () => {
+				document.querySelector<HTMLElement>('main')?.focus({ preventScroll: true });
+				window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+			}, { signal });
+			update();
+			this.cleanup = () => { controller.abort(); observer.disconnect(); cancelAnimationFrame(frame); };
+		}
+		disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined; }
+	}
+	if (!customElements.get('reading-tools')) customElements.define('reading-tools', ReadingTools);
+</script>
+
+<style>
+	reading-tools { display: contents; }
+	.reading-progress { position: fixed; z-index: 30; top: 0; left: 0; height: 2px; width: 100%; pointer-events: none; }
+	.reading-progress span { display: block; width: 100%; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+	.back-to-top { position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); width: 44px; height: 44px; border: 1px solid var(--rule); border-radius: 50%; background: var(--paper-2); color: var(--ink); font: 22px var(--sans); cursor: pointer; box-shadow: 0 3px 14px #0000000b; }
+	.back-to-top:hover { color: var(--accent); border-color: var(--accent); }
+	.back-to-top:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+	.back-to-top[hidden] { display: none; }
+</style>

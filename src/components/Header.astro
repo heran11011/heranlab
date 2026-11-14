@@ -1,15 +1,28 @@
 ---
 import { profile } from '../data/profile';
 import HeaderLink from './HeaderLink.astro';
+import ThemePicker from './ThemePicker.astro';
 ---
 
 <header class="top">
 	<div class="wrap">
 		<a class="brand" href="/"><b>{profile.name}</b><span class="mono">{profile.nameEn}</span></a>
-		<nav class="nav" aria-label="主导航">
-			<HeaderLink href="/work/">作品</HeaderLink>
-			<HeaderLink href="/content/">内容</HeaderLink>
-			<HeaderLink href="/about/">关于</HeaderLink>
-		</nav>
+		<div class="header-right">
+			<nav class="nav" aria-label="主导航">
+				<HeaderLink href="/content/">内容</HeaderLink>
+				<HeaderLink href="/work/">作品</HeaderLink>
+				<HeaderLink href="/about/">关于</HeaderLink>
+			</nav>
+			<ThemePicker />
+		</div>
 	</div>
 </header>
+
+<style>
+	@media (max-width: 600px) {
+		.top .wrap { gap: 14px; }
+		.header-right { gap: 14px; }
+		.nav { gap: 14px; font-size: 14px; }
+		.brand .mono { display: none; }
+	}
+</style>

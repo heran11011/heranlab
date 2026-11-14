@@ -2,12 +2,13 @@
    改颜色、字体、间距只改 :root 这一段 */
 
 :root {
+	color-scheme: light;
 	--paper: #f5f2e9;
 	--paper-2: #fbf9f3; /* 便签、卡片 */
 	--paper-3: #ebe7db; /* 命令块、占位图底 */
 	--ink: #23251f;
 	--ink-2: #5f6058; /* 次要文字 */
-	--ink-3: #8c8b80; /* 标签、日期 */
+	--ink-3: #707064; /* 标签、日期：小字号仍需清楚可读 */
 	--rule: #dad5c7;
 	--accent: #2f4a8a; /* 钢笔蓝：链接、待补标记 */
 	--marker: #f1e07a; /* 荧光笔：全站只用一两处 */
@@ -23,12 +24,28 @@
 	--top: 60px;
 }
 
+/* 借鉴参考页的阅读配色：只换色彩角色，不改变内容与排版。 */
+:root[data-tone='forest'] {
+	--paper: #eff3eb; --paper-2: #f7faf4; --paper-3: #dfe8d8;
+	--ink: #253a2c; --ink-2: #52634f; --ink-3: #67775e;
+	--rule: #cbd7c1; --accent: #486648; --marker: #d9dda0;
+}
+:root[data-tone='night'] {
+	color-scheme: dark;
+	--paper: #1c211d; --paper-2: #242c26; --paper-3: #313d32;
+	--ink: #eee9dc; --ink-2: #c4c6b5; --ink-3: #a5b09d;
+	--rule: #465446; --accent: #e4c68d; --marker: #596342;
+}
+
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top) + 16px); }
+.skip-link { position: fixed; top: 12px; left: 16px; z-index: 50; padding: 8px 14px; background: var(--paper-2); color: var(--ink); border: 1px solid var(--ink); border-radius: 4px; transform: translateY(-150%); }
+.skip-link:focus { transform: translateY(0); }
+main:focus { outline: none; }
 body {
 	margin: 0;
 	background-color: var(--paper);
-	background-image: radial-gradient(rgba(35, 37, 31, 0.07) 1px, transparent 1px);
+	background-image: radial-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
 	background-size: 22px 22px;
 	color: var(--ink);
 	font: 16px/1.7 var(--sans);
@@ -47,13 +64,12 @@ img { max-width: 100%; height: auto; display: block; }
 /* ---------- 顶栏 ---------- */
 .top {
 	position: sticky; top: 0; z-index: 10;
-	background: rgba(245, 242, 233, 0.86);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
+	background: var(--paper);
 	border-bottom: 1px solid var(--rule);
 }
 .top .wrap { display: flex; align-items: center; justify-content: space-between; height: var(--top); gap: 24px; }
-.brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; }
+.brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; flex: none; }
+.header-right { display: flex; align-items: center; gap: 24px; min-width: 0; }
 .brand b { font-family: var(--serif-zh); font-weight: 400; font-size: 22px; }
 .nav { display: flex; gap: 28px; font-size: 15px; }
 .nav a { text-decoration: none; color: var(--ink-2); padding: 4px 0; border-bottom: 1px solid transparent; }

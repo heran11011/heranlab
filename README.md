@@ -14,6 +14,18 @@ npm run build
 npm run check:content
 ```
 
+## 首页与阅读交互
+
+首页先展示真实图文精选和横向视频放映架，再放工具作品、介绍与联系方式；无公开封面的内容仅用文字，不伪造图片。
+
+- `src/components/home/`：图文条目与视频横滑，主题筛选、键盘翻动与 reduced motion。
+- `src/lib/home.ts`：主题分类及已核验封面的尺寸/放行范围。
+- `src/components/ThemePicker.astro`：暖纸、森林、夜色；本地保存阅读配色，跨页面恢复。
+- `src/components/ReadingTools.astro`：按实际滚动更新进度、回到顶部，不持续运行动画循环。
+- `public/social/avatar-round.png`：本人授权的原头像圆形透明裁切，未重新画人物。
+
+交互参考本地 Delicacy HTML 的换肤、横滑与阅读提示，仅借形式，不搬参考文件中的人物资料、项目文案或花丛画布。无 JavaScript 时核心内容与视频横滑仍可读，非功能控件隐藏。
+
 ## 内容与来源
 
 - `src/data/profile.ts`：对外介绍、作品进展与公开联系方式。

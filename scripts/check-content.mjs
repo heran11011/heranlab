@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import sharp from 'sharp';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const items = JSON.parse(await readFile(path.join(root, 'src/data/library.json'), 'utf8'));
@@ -48,7 +49,7 @@ async function checkGenerated(dir) {
 			const text = await readFile(file, 'utf8');
 			assert.ok(!privateTerms.some((term) => text.includes(term)), `Private detail in ${path.relative(root, file)}`);
 			if (entry.name.endsWith('.html')) {
-				assert.ok(text.includes('/social/xiaohongshu-avatar.webp?v=20261114'), `Avatar favicon missing in ${entry.name}`);
+				assert.ok(text.includes('/social/avatar-round.png?v=20261114-round'), `Avatar favicon missing in ${entry.name}`);
 				assert.ok(!text.includes('href="/favicon.svg"'), 'Old H favicon is still linked');
 			}
 			count++;
@@ -56,5 +57,22 @@ async function checkGenerated(dir) {
 	}
 	return count;
 }
+// 页签须是真透明的圆形，不能用画出的棋盘格冒充 alpha。
+const avatar = sharp(path.join(root, 'public/social/avatar-round.png'));
+const avatarMeta = await avatar.metadata();
+assert.ok(avatarMeta.hasAlpha, 'Round favicon must have alpha');
+assert.equal(avatarMeta.width, avatarMeta.height, 'Favicon must be square-sized with circular pixels');
+const { data: avatarPixels, info: avatarInfo } = await avatar.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+for (const [x, y] of [[0, 0], [avatarInfo.width - 1, 0], [0, avatarInfo.height - 1], [avatarInfo.width - 1, avatarInfo.height - 1]]) {
+	assert.equal(avatarPixels[(y * avatarInfo.width + x) * 4 + 3], 0, 'Favicon corner must be transparent');
+}
+const homeHTML = await readFile(path.join(root, 'dist/index.html'), 'utf8');
+const home = homeHTML.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
+assert.ok(home, 'Homepage main missing');
+assert.ok(home.includes('/content/dawdex-adventurex/'), 'Lead content missing on homepage');
+assert.ok(home.includes('/content/dawdex-video/'), 'Video content missing on homepage');
+assert.ok(home.includes('/content/early-video-regret/'), 'Second video missing on homepage');
+assert.ok((home.match(/<img\b/g) || []).length >= 5, 'Homepage has lost its image-led layout');
+assert.ok(!home.includes('截图待补') && !home.includes('照片待补'), 'Placeholder images must not lead the homepage');
 const checked = await checkGenerated(path.join(root, 'dist'));
-console.log(`PASS: ${items.length} verified entries, ${ids.size} detail pages, old article URLs, avatar favicon; ${checked} generated files scanned for identifying details.`);
+console.log(`PASS: image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, transparent round favicon; ${checked} generated files scanned for identifying details.`);

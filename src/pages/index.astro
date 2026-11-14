@@ -1,113 +1,170 @@
 ---
-import Todo from '../components/Todo.astro';
 import AccountCards from '../components/AccountCards.astro';
-import WorkCard from '../components/WorkCard.astro';
-import { SITE_DESCRIPTION } from '../consts';
+import HomeEntry from '../components/home/HomeEntry.astro';
+import VideoShelf from '../components/home/VideoShelf.astro';
 import { profile } from '../data/profile';
-import { library, platformLabels } from '../data/library';
+import { library } from '../data/library';
 import Base from '../layouts/Base.astro';
+import { homeCover, homeTopics } from '../lib/home';
 import { getWorks } from '../lib/work';
 
-const works = await getWorks();
-const featured = works.filter((w) => w.data.featured).slice(0, 3);
-const selectedContent = library.filter((item) => item.featured).slice(0, 3);
-const h = profile.headline;
+// 编辑选读，不声称按时间排序。标题、简介、图片、发布日期均来自内容库。
+const readingIds = ['dawdex-adventurex', 'deepseek-roleplay', 'mac-autofill', 'meme-art-origin', 'ai-phone-credit', 'ai-writing-on-x'];
+const reading = readingIds.flatMap((id) => {
+	const item = library.find((entry) => entry.id === id && entry.format !== 'video');
+	return item ? [item] : [];
+});
+const variants = ['lead', 'support', 'support', 'gallery', 'snippet', 'snippet'] as const;
+// 已核验封面的视频优先；同组保留内容库顺序，不伪装成时间排序。
+const videos = library.filter((item) => item.format === 'video')
+	.sort((a, b) => Number(!!homeCover(b)) - Number(!!homeCover(a)));
+// 已有完整说明的工具，缩成路径便签；不把待补大图带到首页。
+const works = (await getWorks()).filter((work) => !work.data.bodyTodo).slice(0, 2);
+const description = 'AI 使用笔记、日常观察，和自己做的东西';
 ---
 
-<Base description={SITE_DESCRIPTION}>
-	<section class="hero">
-		<aside class="note rise d1">
-			<span class="mono">NO.00 · 自我介绍</span>
-			<h1>
-				{h.before}{h.br && <br />}{h.mid}<span class="hl">{h.hl}</span>{h.after}{h.todo && <Todo label={h.todo} where="首页 · 首屏那句话" />}
-			</h1>
-			<dl class="facts">
-				{profile.facts.map((f) => <div><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
-			</dl>
-			<div class="btns">
-				<a class="btn solid" href="/work/">看作品 →</a>
-				<a class="btn" href="#contact">联系我</a>
-			</div>
-		</aside>
-
-		<div>
-			<div class="sec-head rise d2">
-				<h2>精选作品</h2>
-				<a href="/work/">全部作品 →</a>
-			</div>
-			<div class="works">
-				{featured.map((w, i) => <WorkCard work={w} index={i + 1} wide={w.data.wide} class={`rise d${Math.min(i + 2, 4)}`} />)}
-			</div>
-		</div>
-	</section>
-
-	<section class="row">
-		<header>
-			<h2>作品进展</h2>
-			<span class="mono">做过的 · 在做的</span>
+<Base description={description}>
+	<div class="home-page">
+		<header class="masthead">
+			<div class="masthead-title"><h1>{profile.name} <span>{profile.nameEn}</span></h1><p>{description}</p></div>
+			<a class="random-read" href={reading[0] ? `/content/${reading[0].id}/` : '/content/'} data-random-read>随便翻一篇 <span aria-hidden="true">↗</span></a>
 		</header>
-		<ol class="timeline">
-			{
-				profile.timeline.map((t) => (
-					<li>
-						<span class="mono">{t.when}</span>
-						<div>
-							<h3>{'href' in t && t.href ? <a href={t.href}>{t.title}</a> : t.title}</h3>
-							<p>{t.desc}</p>
-						</div>
-					</li>
-				))
-			}
-		</ol>
-	</section>
 
-	<section class="row" id="writing">
-		<header>
-			<h2>写的东西</h2>
-			<span class="mono">笔记 · 观察 · 视频</span>
-			<p class="content-intro">散落在各个平台的内容，<br />也在这里慢慢整理。</p>
-			<a class="btn" href="/content/">去看全部内容 →</a>
-		</header>
-		<div>
-			<ol class="home-content">
-				{selectedContent.map((item, i) => (
-					<li>
-						<a href={`/content/${item.id}/`}>
-							<span class="mono">0{i + 1} / {platformLabels[item.platform]} · {item.topic}</span>
-							<h3>{item.title}</h3>
-							<p>{item.excerpt}</p>
-							<span class="read">在这里读 →</span>
-						</a>
-					</li>
-				))}
-			</ol>
-			<AccountCards />
-		</div>
-	</section>
-
-	<section class="row" id="contact">
-		<header>
-			<h2>联系</h2>
-			<span class="mono">邮件最快</span>
-		</header>
-		<div>
-			<div class="mail">
-				<a href={`mailto:${profile.email}`}>{profile.email}</a>
-				<button class="copy" type="button" data-copy={profile.email}>复制</button>
+		<section class="reading-room" id="writing" aria-labelledby="reading-title" data-home-reading>
+			<header class="reading-heading">
+				<h2 id="reading-title">翻开这一页</h2>
+				<a href="/content/">全部 {library.length} 条内容 <span aria-hidden="true">→</span></a>
+			</header>
+			<div class="reading-tools" hidden>
+				<div class="topic-buttons" role="group" aria-label="筛选图文与短句主题">
+					{homeTopics.map((topic) => <button type="button" data-home-topic={topic} aria-pressed={topic === '全部' ? 'true' : 'false'} aria-controls="home-reading-grid">{topic}</button>)}
+				</div>
+				<p class="reading-count" aria-live="polite" aria-atomic="true">选读 {reading.length} 篇图文与短句</p>
 			</div>
-		</div>
-	</section>
+			<div class="reading-grid" id="home-reading-grid">
+				{reading.map((item, index) => <HomeEntry item={item} variant={variants[index]} />)}
+			</div>
+			<noscript><p class="no-script-note">图文与短句已全部展开，视频在下面的放映架。</p></noscript>
+		</section>
+
+		<VideoShelf items={videos} />
+
+		<section class="work-notes" aria-labelledby="work-notes-title">
+			<header class="section-heading"><div><p class="section-kicker">笔记之外，也动手做</p><h2 id="work-notes-title">工具小抽屉</h2></div><a href="/work/">所有作品 →</a></header>
+			<div class="project-paths">
+				{works.map((work) => {
+					const technique = work.data.meta.find((meta) => ['技术', '形式'].includes(meta.k));
+					return <a class="project-path" href={`/work/${work.id}/`}>
+						<span class="project-route">/work/{work.id}/ <span aria-hidden="true">↗</span></span>
+						<h3>{work.data.title}</h3>
+						<p>{work.data.summary.split('。')[0]}。</p>
+						{technique && <small>{technique.v}</small>}
+					</a>;
+				})}
+			</div>
+		</section>
+
+		<section class="last-page" id="contact" aria-labelledby="last-page-title">
+			<div class="closing-note"><p class="section-kicker">页末 · 关于这里</p><h2 id="last-page-title">内容散落，<br />在这里放好。</h2><p>从 AI 的一次实测，到一个不顺手的界面，再到自己做的小工具。原来的笔记、短句和视频，在这里一起翻。</p><a href="/about/">再认识一下禾冉 →</a></div>
+			<div class="closing-links"><AccountCards /><div class="contact-line"><span>有想聊的？写封邮件。</span><a href={`mailto:${profile.email}`}>{profile.email}</a><button class="copy" type="button" data-copy={profile.email}>复制邮箱</button></div></div>
+		</section>
+	</div>
 </Base>
 
+<script>
+	document.querySelectorAll<HTMLElement>('[data-home-reading]').forEach((room) => {
+		const tools = room.querySelector<HTMLElement>('.reading-tools');
+		const grid = room.querySelector<HTMLElement>('.reading-grid');
+		const count = room.querySelector<HTMLElement>('.reading-count');
+		const buttons = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-home-topic]'));
+		const entries = Array.from(room.querySelectorAll<HTMLElement>('[data-home-entry]'));
+		if (!tools || !grid || !count) return;
+		buttons.forEach((button) => button.addEventListener('click', () => {
+			const topic = button.dataset.homeTopic;
+			buttons.forEach((entry) => entry.setAttribute('aria-pressed', String(entry === button)));
+			entries.forEach((entry) => { entry.hidden = topic !== '全部' && entry.dataset.topic !== topic; });
+			grid.dataset.filtered = String(topic !== '全部');
+			count.textContent = `${topic === '全部' ? '选读' : topic} ${entries.filter((entry) => !entry.hidden).length} 篇图文与短句`;
+		}));
+		tools.hidden = false;
+	});
+	const randomRead = document.querySelector<HTMLAnchorElement>('[data-random-read]');
+	if (randomRead) {
+		const paths = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-home-entry] h3 a')).map((link) => link.getAttribute('href')).filter((path): path is string => !!path);
+		if (paths.length) randomRead.href = paths[Math.floor(Math.random() * paths.length)];
+	}
+</script>
+
 <style>
-	.content-intro { color: var(--ink-2); font-size: 15px; margin: 18px 0 24px; }
-	.home-content { list-style: none; padding: 0; margin: 0 0 30px; }
-	.home-content li + li { border-top: 1px dashed var(--rule); }
-	.home-content a { display: block; padding: 22px 0; text-decoration: none; }
-	.home-content li:first-child a { padding-top: 0; }
-	.home-content h3 { font-family: var(--serif-zh); font-size: 24px; line-height: 1.4; font-weight: 400; margin: 7px 0; }
-	.home-content p { color: var(--ink-2); font-size: 15px; margin: 0; }
-	.home-content .read { display: inline-block; margin-top: 12px; color: var(--accent); font-size: 13px; }
-	.home-content a:hover h3 { text-decoration: underline; text-underline-offset: 5px; }
-	.home-content a:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+	.home-page { padding-bottom: 20px; --home-ease: cubic-bezier(0, 0, .2, 1); }
+	.masthead { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 0 20px; border-bottom: 1px solid var(--rule); }
+	.masthead-title { display: flex; gap: 26px; align-items: center; flex-wrap: wrap; }
+	h1 { font: 400 28px/1.3 var(--serif-zh); margin: 0; white-space: nowrap; }
+	h1 span { color: var(--accent); font-family: var(--serif-en); font-style: italic; margin-left: 6px; }
+	.masthead p { margin: 0; font-size: 14px; color: var(--ink-2); }
+	.random-read { display: inline-flex; gap: 16px; align-items: center; flex: none; min-height: 42px; padding: 0 15px; border: 1px solid var(--rule); border-radius: 24px; color: var(--accent); font-size: 12px; text-decoration: none; background: var(--paper-2); transition: border-color 180ms var(--home-ease), transform 180ms var(--home-ease); }
+	.random-read:hover { transform: translateY(-2px); border-color: var(--accent); }
+	.reading-room { padding-top: 22px; }
+	.reading-heading, .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+	h2 { font: 400 30px/1.3 var(--serif-zh); margin: 0; }
+	.reading-heading h2 { font-size: 22px; }
+	.reading-heading > a, .section-heading > a { font-size: 12px; color: var(--ink-2); text-decoration: none; }
+	.reading-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 22px; }
+	.reading-tools[hidden] { display: none; }
+	.topic-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+	.topic-buttons button { font: 13px var(--sans); cursor: pointer; min-height: 38px; padding: 0 14px; border: 1px solid transparent; border-radius: 22px; background: transparent; color: var(--ink-2); transition: background 180ms var(--home-ease), color 180ms var(--home-ease); }
+	.topic-buttons button[aria-pressed='true'] { color: var(--paper-2); background: var(--accent); }
+	.topic-buttons button:hover:not([aria-pressed='true']) { background: var(--paper-3); color: var(--ink); }
+	.reading-count { font: 11px/1.5 var(--mono); margin: 0; color: var(--ink-2); }
+	.reading-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 24px 32px; margin-top: 22px; align-items: start; }
+	.reading-grid[data-filtered='true'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.reading-grid[data-filtered='true'] > :global(.entry) { grid-column: auto; grid-row: auto; }
+	.reading-grid[data-filtered='true'] > :global(.entry--lead) { grid-column: 1 / -1; max-width: 760px; }
+	.no-script-note { font-size: 12px; color: var(--ink-2); }
+	.work-notes { padding: 40px 0 48px; }
+	.section-kicker { font-size: 12px; color: var(--accent); margin: 0 0 7px; }
+	.project-paths { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-top: 24px; }
+	.project-path { display: block; padding: 22px 24px; border: 1px solid var(--rule); background: var(--paper-2); border-radius: 8px; text-decoration: none; transition: border-color 180ms var(--home-ease); }
+	.project-route { font: 11px/1.5 var(--mono); color: var(--accent); display: flex; justify-content: space-between; gap: 12px; }
+	.project-path h3 { font: 400 24px/1.4 var(--serif-zh); margin: 12px 0 8px; }
+	.project-path p { font-size: 14px; color: var(--ink-2); margin: 0 0 12px; }
+	.project-path small { font: 11px/1.6 var(--mono); color: var(--ink-2); }
+	.project-path:hover { border-color: var(--accent); }
+	.project-path:hover h3 { color: var(--accent); }
+	.last-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 64px; padding: 40px 0 52px; border-top: 1px solid var(--rule); }
+	.closing-note h2 { font-size: 32px; line-height: 1.4; }
+	.closing-note > p:not(.section-kicker) { max-width: 29em; font-size: 14px; color: var(--ink-2); margin: 18px 0; }
+	.closing-note > a { font-size: 13px; color: var(--accent); text-decoration: none; display: inline-flex; min-height: 38px; align-items: center; }
+	.closing-links { min-width: 0; padding-top: 4px; }
+	.contact-line { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; padding-top: 24px; margin-top: 24px; border-top: 1px dashed var(--rule); }
+	.contact-line > span { width: 100%; font-size: 12px; color: var(--ink-2); }
+	.contact-line > a { font: 14px/1.8 var(--mono); color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
+	.home-page a:focus-visible, .home-page button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+	.reading-heading a:hover, .section-heading a:hover, .closing-note a:hover, .contact-line a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+	@media (max-width: 1000px) {
+		.masthead-title { display: block; }
+		.masthead p { margin-top: 6px; }
+		.reading-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
+		.last-page { gap: 32px; }
+	}
+	@media (max-width: 700px) {
+		.masthead { align-items: start; gap: 12px; padding: 20px 0; }
+		h1 { font-size: 26px; }
+		.masthead p { max-width: 19em; font-size: 13px; }
+		.random-read { padding: 0 11px; gap: 6px; margin-top: 2px; }
+		.reading-tools { display: block; }
+		.topic-buttons { gap: 3px; }
+		.topic-buttons button { padding: 0 12px; }
+		.reading-count { margin-top: 10px; }
+		.reading-grid, .reading-grid[data-filtered='true'] { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+		.reading-grid[data-filtered='true'] > :global(.entry--lead) { grid-column: auto; }
+		.project-paths, .last-page { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+		.project-path { padding: 20px; }
+		.last-page { padding: 32px 0; gap: 24px; }
+		.closing-note h2 br { display: none; }
+		.closing-note h2 { font-size: 28px; }
+		.work-notes { padding: 32px 0; }
+	}
+	@media (max-width: 380px) { .random-read { min-height: 36px; font-size: 11px; padding: 0 9px; } }
+	@media (prefers-reduced-motion: reduce) { .random-read, .topic-buttons button, .project-path { transition: none; } .random-read:hover { transform: none; } }
 </style>
