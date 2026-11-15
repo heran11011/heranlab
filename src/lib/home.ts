@@ -25,8 +25,18 @@ const safeVideoCovers: Record<string, string> = {
 	'early-video-regret': '/content/early-video-regret.jpg',
 };
 
+// 结构化正文和公众号封面只接受本地图片，不允许远程 URL、路径穿越或 SVG。
+export function isWechatImageSrc(src: string) {
+	return /^\/content\/wechat\/(?:[a-z0-9_-]+\/)*[a-z0-9_-]+\.(?:avif|webp|png|jpe?g)$/i.test(src);
+}
+
 export function homeCover(item: LibraryItem) {
 	if (!item.cover || (item.format === 'video' && safeVideoCovers[item.id] !== item.cover)) return undefined;
+	if (item.platform === 'wechat') {
+		if (!isWechatImageSrc(item.cover)) return undefined;
+		const dimension = (value?: number) => value && Number.isSafeInteger(value) && value > 0 ? value : undefined;
+		return { src: item.cover, width: dimension(item.coverWidth), height: dimension(item.coverHeight) };
+	}
 	const size = coverSizes[item.cover];
 	if (!size) return undefined;
 	return { src: item.cover, width: size[0], height: size[1] };

@@ -9,7 +9,7 @@ import { ymd } from '../../lib/date';
 const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const lead = library.find((item) => item.featured) || library[0];
 const items = lead ? [lead, ...library.filter((item) => item !== lead)] : [];
-const platforms = ['xiaohongshu', 'x', 'bilibili'] as const;
+const platforms = ['xiaohongshu', 'x', 'bilibili', 'wechat'] as const;
 const filters = [
 	{ id: 'all', label: '全部' },
 	...platforms.map((id) => ({ id, label: platformLabels[id] })),
@@ -17,13 +17,13 @@ const filters = [
 ];
 ---
 
-<Base title="内容" description="公开笔记、帖子和视频的剪报册。保留原题、正文与出处，也收着站内写过的文章。">
+<Base title="内容" description="公开笔记、帖子、视频和公众号文章的剪报册。保留原题、正文与出处，也收着站内写过的文章。">
 	<div class="content-index">
 		<header class="content-hero">
 			<div class="content-intro">
 				<p class="content-eyebrow">内容剪报册 <span aria-hidden="true">/</span> CONTENT</p>
 				<h1>写下的，<br />做过的。</h1>
-				<p class="content-deck">笔记、帖子，还有视频。<br />把散在不同地方的内容，收在同一册里。</p>
+				<p class="content-deck">笔记、帖子、视频，还有文章。<br />把散在不同地方的内容，收在同一册里。</p>
 				<p class="content-hero-note">保留原题与出处，能在这里读，也能回到原文。</p>
 			</div>
 			<aside class="content-overview" aria-label="内容收录总览">
@@ -97,8 +97,8 @@ const filters = [
 		<section class="content-accounts-section" aria-labelledby="content-accounts-title">
 			<header>
 				<p class="content-eyebrow">封底 / 账号入口</p>
-				<h2 id="content-accounts-title">公众号还没有整理进来</h2>
-				<p>先放二维码。其他平台，也可以直接去主页翻。</p>
+				<h2 id="content-accounts-title">也可以在这些地方找到我</h2>
+				<p>公众号扫码关注，其他平台可以直接去主页翻。</p>
 			</header>
 			<AccountCards />
 		</section>
@@ -124,7 +124,8 @@ const filters = [
 			const archive = this.querySelector<HTMLElement>('[data-library-archive]');
 			const normalize = (text: string) => text.normalize('NFKC').toLocaleLowerCase('zh-CN');
 			const searchable = entries.map((element) => ({ element, text: normalize(element.dataset.search || '') }));
-			let platform = 'all';
+			const initialPlatform = new URLSearchParams(window.location.search).get('platform') || 'all';
+			let platform = buttons.some((button) => button.dataset.filter === initialPlatform) ? initialPlatform : 'all';
 
 			const update = () => {
 				const query = input.value.trim();

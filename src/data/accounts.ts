@@ -18,10 +18,15 @@ export interface Account {
 
 export const accounts: Account[] = [
 	{
-		id: 'wechat', label: '公众号', name: '禾冉一起', href: null,
-		description: '扫码在微信中打开公众号。',
+		id: 'wechat', label: '公众号', name: '禾冉一起', href: 'https://mp.weixin.qq.com/mp/homepage?__biz=gh_a3d96212a9c5',
+		description: '技术实验和日常随笔。部分原创文章已经整理成站内阅读页。',
 		qr: { src: '/social/wechat-official-qr.jpg', alt: '公众号“禾冉一起”的关注二维码', caption: '微信扫一扫，关注“禾冉一起”' },
-		items: [],
+		itemsLabel: '公众号选读',
+		items: [
+			{ title: 'RPA+AI才是爬取公众号的正确方式', href: '/content/wechat-rpa-ai-archive/', kind: '自动化实测 · 站内全文' },
+			{ title: '那个3000块的Ai宠物之后，我又见了一个更“没用”的机器人', href: '/content/wechat-gr3-companion/', kind: '日常观察 · 站内全文' },
+			{ title: '愿我们在更好的山顶相遇', href: '/content/wechat-meet-on-a-better-summit/', kind: '随笔 · 站内全文' },
+		], verifiedAt: '2026-11-15',
 	},
 	{
 		id: 'xiaohongshu', label: '小红书', name: '禾冉一起', handle: 'heran11011',

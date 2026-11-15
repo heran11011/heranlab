@@ -1,0 +1,58 @@
+---
+import type { ArticleBlock } from '../../data/library';
+import { isWechatImageSrc } from '../../lib/home';
+import ImageViewer from './ImageViewer.astro';
+
+interface Props {
+	blocks: readonly ArticleBlock[];
+}
+
+const { blocks } = Astro.props;
+const dimension = (value?: number) => value && Number.isSafeInteger(value) && value > 0 ? value : undefined;
+---
+
+<div class="article-blocks">
+	{blocks.map((block) => {
+		switch (block.type) {
+			case 'paragraph':
+				return <p>{block.text}</p>;
+			case 'heading':
+				return <h3>{block.text}</h3>;
+			case 'quote':
+				return <blockquote><p>{block.text}</p></blockquote>;
+			case 'code':
+				return <pre tabindex="0" role="region" aria-label="代码片段，可横向滚动"><code>{block.text}</code></pre>;
+			case 'image':
+				return isWechatImageSrc(block.src) ? (
+					<div class="article-image">
+						<ImageViewer src={block.src} alt={block.alt} caption="原文配图 · 公众号" width={dimension(block.width)} height={dimension(block.height)}>
+							<img src={block.src} alt={block.alt} width={dimension(block.width)} height={dimension(block.height)} loading="lazy" decoding="async" />
+						</ImageViewer>
+					</div>
+				) : <p class="article-image-unavailable">{block.alt || '原文配图'}（图片暂未收录）</p>;
+		}
+	})}
+</div>
+
+<style>
+	.article-blocks { min-width: 0; max-width: 100%; }
+	.article-blocks > p, blockquote p { margin: 0 0 1.2em; white-space: pre-wrap; }
+	h3 { margin: 2em 0 0.8em; color: var(--reader-ink); font: 400 1.4em/1.5 var(--serif-zh); white-space: pre-wrap; text-wrap: pretty; }
+	blockquote { margin: 1.6em 0; border-left: 2px solid var(--reader-leaf); padding: 0.2em 0 0.2em 1em; color: var(--reader-muted); }
+	blockquote p { margin-bottom: 0; }
+	pre { max-width: 100%; min-width: 0; margin: 1.6em 0; padding: 18px; border: 1px solid var(--reader-rule); border-radius: 3px; background: var(--reader-wash); color: var(--reader-ink); font: 0.82em/1.75 var(--mono); white-space: pre; overflow-x: auto; overflow-wrap: normal; word-break: normal; tab-size: 4; }
+	code { font: inherit; white-space: inherit; overflow-wrap: normal; word-break: normal; }
+	pre:focus-visible { outline: 2px solid var(--reader-accent); outline-offset: 4px; }
+	.article-image { min-width: 0; margin: 1.8em 0; }
+	/* 保留长图的自然比例，完整正文图片不沿用侧栏缩略图的高度限制。 */
+	.article-image :global(.image-preview img) { max-height: none; height: auto; }
+	.article-image :global(figcaption) { overflow-wrap: anywhere; }
+	.article-image-unavailable { color: var(--reader-muted); font-size: 0.85em; }
+	.article-blocks > :first-child { margin-top: 0; }
+	.article-blocks > :last-child { margin-bottom: 0; }
+	@media (max-width: 760px) {
+		h3 { margin-top: 1.8em; font-size: 1.3em; }
+		pre { padding: 14px; }
+		.article-image { margin-block: 1.5em; }
+	}
+</style>

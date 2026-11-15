@@ -1,0 +1,427 @@
+{
+  "verifiedAt": "2026-11-15",
+  "articles": [
+    {
+      "id": "wechat-gr3-companion",
+      "sourceUrl": "https://mp.weixin.qq.com/s/VFxYP3GAZTK4rB7z86hM4w",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-08-08",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "ebb2fcad32438e4237fffa6149b67c5d8f40583948b5428a068c347636168b23",
+      "originalBodyImageCount": 5,
+      "includedBodyImageCount": 5
+    },
+    {
+      "id": "wechat-rpa-ai-archive",
+      "sourceUrl": "https://mp.weixin.qq.com/s/yRi9QrvQatmRQxmE78npBg",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-05-30",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "dfcf8aa5ae44cae0ad4af679f9e9f67b26eeeeb9a607ec365e1f8e23501b7ee5",
+      "originalBodyImageCount": 19,
+      "includedBodyImageCount": 18
+    },
+    {
+      "id": "wechat-pixels-and-heartbeats",
+      "sourceUrl": "https://mp.weixin.qq.com/s/i2urC5Jiovwsejf54_CXPA",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-05-13",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "17d49c0e11130731fc5ae23ab6fccd6952d40be891d6bb0a3d2f10d428fead86",
+      "originalBodyImageCount": 8,
+      "includedBodyImageCount": 6
+    },
+    {
+      "id": "wechat-deepseek-prompt-helper",
+      "sourceUrl": "https://mp.weixin.qq.com/s/MzxMr945eOnqlSuKKac2bg",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-04-15",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "7fba0e00ea7d0d4502b4698f5f3d3c17d7cc9249c887204327bbc6f2e5937afc",
+      "originalBodyImageCount": 4,
+      "includedBodyImageCount": 4
+    },
+    {
+      "id": "wechat-order-anxiety",
+      "sourceUrl": "https://mp.weixin.qq.com/s/kV1TXGrG2O6LcPYzSDWsCw",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-02-18",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "f5ba24fb5926a75d2c9565764a52b4f2c264c6079475b20ac1e99715ccea75b2",
+      "originalBodyImageCount": 1,
+      "includedBodyImageCount": 1
+    },
+    {
+      "id": "wechat-lantern-festival-smoke",
+      "sourceUrl": "https://mp.weixin.qq.com/s/ne3rv2gDm8mRhkN5NPp0Rg",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-02-12",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "5ff4fb87923a8fd1175cfc5e3136117cf5c63075a58ee830d9e31873d8864b64",
+      "originalBodyImageCount": 0,
+      "includedBodyImageCount": 0
+    },
+    {
+      "id": "wechat-think-beyond-today",
+      "sourceUrl": "https://mp.weixin.qq.com/s/tpQDx6alL7f-w8F90lMWoA",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-02-10",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "697897e0ca1b580805ba5db700cf86a58f1abbc866430d522cc25b20178b5a41",
+      "originalBodyImageCount": 1,
+      "includedBodyImageCount": 1
+    },
+    {
+      "id": "wechat-start-before-ready",
+      "sourceUrl": "https://mp.weixin.qq.com/s/_9XHf_f45NcAFiINeX-E9A",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-02-09",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "3876dfd74d76437cea70d93a3c6cc7267f2e36cd244ea741fc045e515f9d28e9",
+      "originalBodyImageCount": 1,
+      "includedBodyImageCount": 1
+    },
+    {
+      "id": "wechat-approval-trap",
+      "sourceUrl": "https://mp.weixin.qq.com/s/lISfY8ypNV1Jl0h4QIUrLw",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2025-02-08",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "7852f641d4a6eb9f046b0b0b13ef6f9d9eff8128a8a053566e88ede760da6ae8",
+      "originalBodyImageCount": 1,
+      "includedBodyImageCount": 1
+    },
+    {
+      "id": "wechat-moment-of-realization",
+      "sourceUrl": "https://mp.weixin.qq.com/s/BWi20ZnzM6DPCLfKbV0SYw",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2024-12-05",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "6ddba7c5c051f1c1ef65d97c5e181fb1aa23c537ce05ff42eb78490043a17993",
+      "originalBodyImageCount": 0,
+      "includedBodyImageCount": 0
+    },
+    {
+      "id": "wechat-upside-down-world",
+      "sourceUrl": "https://mp.weixin.qq.com/s/W4yETPKYHrCSuEJLfG_wWg",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2024-12-04",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "3e04ca7d0ecd7ac1366b77278f87c8883281490dbffd5371ef28681fc9fc21b9",
+      "originalBodyImageCount": 0,
+      "includedBodyImageCount": 0
+    },
+    {
+      "id": "wechat-meet-on-a-better-summit",
+      "sourceUrl": "https://mp.weixin.qq.com/s/wd0Bnr-6NN_wZYcL5oElzw",
+      "account": "禾冉一起",
+      "original": true,
+      "publishedAt": "2024-12-01",
+      "verifiedAt": "2026-11-15",
+      "normalizedTextSha256": "54d9463c0d14ceb7b877a5775843e40efd0b82cbd5d29ba5c67b31e10518237f",
+      "originalBodyImageCount": 0,
+      "includedBodyImageCount": 0
+    }
+  ],
+  "images": [
+    {
+      "file": "/content/wechat/wechat-gr3-companion-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuRJVS7jrviaJQBjLj6ZztyZrdBEX1kL4Nr8Brt4WnPsmgukO8Gib36qwBTaY87ibGjhfYS4GFibbicLK9A/0?wx_fmt=jpeg",
+      "sha256": "958fe2066be6dc6df41586baa5d506921a4af44bb987900141b6eda01613e34f",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-gr3-companion-image-01.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuRJVS7jrviaJQBjLj6ZztyZrSlobycCCMwYF8mg7XWb7pEvX0tnzFNHpicjoOcv7vv12Be48wtgujSA/640?wx_fmt=jpeg#imgIndex=0",
+      "sha256": "4ba85e226db2edaa75b3ea270633686951c1ba874cd10662e1146ab746ea17ca",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-gr3-companion-image-02.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuRJVS7jrviaJQBjLj6ZztyZrk8bPKzMdD8aGGmRIG0a5m07R9evbTUIJvzejW037ZTehVQwQzuQEFw/640?wx_fmt=png#imgIndex=1",
+      "sha256": "68c966a70a8c4064ff32d2ccc287094831a189b3c5eecc839459b265042d77ed",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-gr3-companion-image-03.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuRJVS7jrviaJQBjLj6ZztyZrVws27gvM3v7Ks7LTWWLsIWDQDnqsulreuKIgVrgeZLQGJdWBGUntIw/640?wx_fmt=jpeg#imgIndex=2",
+      "sha256": "40778375822be55b3f6b6df48e0f5897a31b7fdfdf2781941ec82b1cac5cc77c",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-gr3-companion-image-04.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuRJVS7jrviaJQBjLj6ZztyZrpRYRlIsHGxeghzl8eZ0hxiaeZUqBoNMSStZjWzuhiaGNYDRZVEBicZD0w/640?wx_fmt=png#imgIndex=3",
+      "sha256": "fca2471a865ede55b86004197fcbfd0bbbe2b4a622f563f9ff9d1d6f07aa6286",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-gr3-companion-image-05.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuRJVS7jrviaJQBjLj6ZztyZrAgUozH544FrPpshNr4bIVPgEOiaCg0DH3tomUMGiawicsqbLBAXJWCGiaA/640?wx_fmt=jpeg#imgIndex=4",
+      "sha256": "d43248bf8afd6f1ba5f350edfc8f69e4c948090e33b7548b845045e04b9312be",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuT4Su7HeJlWstwxOQ7XQiaBvGo1GZlHtOyAL4CoKOLLJicUnEvfwluLFwMaU8rbUZqWJEEfhpyOrkSg/0?wx_fmt=jpeg",
+      "sha256": "64f50920054629a539afc202224e5f98bf0a0e44520248f5a14580820b74e952",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-01.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1W4BR37iau5icpRr7Lz9E2d3iaL3FXXlzONq7Xqdb7ZcpHSgKyFxjcicBqLw/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=0",
+      "sha256": "25524296ff481160292f1be4ae4ab4c8a5ea93310ffee4332f370634c3ef94a2",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-02.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1W5hh8tLkiayImHLEbl6y6hPoZjZXgicuJqNkibtnicvAiczDPrib4aIKEd1YA/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=1",
+      "sha256": "37b82c979759841311164d2a06e99f3d7d8f4bfa61c669a95949304b3faf9adc",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-03.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WD4TUza3gnLibvR7SOTMwug6ScyqmpoXLnUYjAeOUtGjU0iaicDNyWicOpA/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=2",
+      "sha256": "a8592e095678032cbb936f7b10fb53349aaa93b37b3fe316873fc8d5b5a8df7e",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-05.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WyTicWOhlfCMW4Snh5jQQ5iaY9l5oa1hrYPXTrY4dzMNgria3xibFnC22CQ/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=4",
+      "sha256": "0085384827ce5b21354903cf99db1308fc1d78a91a5bfbdcd08a202b457e44b0",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-06.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WXicAJtc0L80aic9IYlQ4gNQwibINWpuR9WTcIbTdelLUgLsKpJrzBo9aQ/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=5",
+      "sha256": "140a31198fd688ccd645857384c5cc35887d8c248527184c4d5a2c60b79e371f",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-07.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WzibuYE4ajqA7myY2QC0uQ4BRS0NyoUMY5ibickk5t9uPFN0RxibL9zevicw/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=6",
+      "sha256": "6b0e82eb4f4d329e9297934435ac0f22f07e8ab28608a8fbb3e542a2d69402d4",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-08.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WTQ4VltYI2PibO30sxOhsQASmicKmKpGn8jNjjJaR1zV32nbLjtRSm4EQ/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=7",
+      "sha256": "a2a706187ec14b7d59394037ec1b2dcf7753d065c0864ee7fee0dcc14cb41a64",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-09.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WPx1mlC5gI3xI5lY34Ekk3ictjpic36crrflgWPtAicXxK4RPicqqaa5bpg/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=8",
+      "sha256": "ad1a05160daca9a21b17f0429fda9536169f8799c611ec79a0b48ae946e4308f",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-10.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WC1VIYA4xz7yPjFfRGdIRy5mvT3VAQUicicRMCBVqapEiaBl88oAK87qew/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=9",
+      "sha256": "23d3897271a24ff8ec389aa331f08a20c3b68f4712a88c4433edcf0f041d039b",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-11.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WyDaWicASnyy6Eo0Zv7eUzlIUb9hjUTcVtH9xiaibzyStQfibqhTGVd4OKg/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=10",
+      "sha256": "4d6b7988cb0d997ccd8f908d4336760a04007f08f6f1fc31d54f049c75f5a503",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-12.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1Wq6OGTy6FsXrreJdibpdjawyPsC4J53tc8aQMW5fwHic1kZFCAEZ11s8A/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=11",
+      "sha256": "ddbbfcf41b882d81e3e1edd45bb0ac51e00d1176a5892139da901354c8c02825",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-13.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1Wl9EDdkUDtpv00lPkDRSITDoZZb2nmiaUyrQRAtBHplsXAUQ7tlVTXGg/640?wx_fmt=png&from=appmsg#imgIndex=12",
+      "sha256": "9f3000b0cd3f55a8a4f9f4a7f63c04e997437ffc73dbf6f914a0dbc5218d82ba",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-14.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WicqkoCgsZe2nplVgwWq6ibWZB68icEh5icaKQSqt1Z72dVzab2icZ8D4Qxw/640?wx_fmt=png&from=appmsg#imgIndex=13",
+      "sha256": "299fa350fcd7f67da4dfa965fef5a580aca312f521e6e76c5fdf75460770c104",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-15.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WFozIVK3jYzHJald0IEaqe5HJUnNeG2eNJJSFQoT7ibxO4D0pnQdTImg/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=14",
+      "sha256": "f895bcc62e02a2cc57500a2ef13e59c7b7058bf6dd89a283a64fbc42c617c9e3",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-16.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WiaHGicZVPpx8u23D5st5d6JeMwbulniaOtQhB6FeRfkoficaxFxUYibbj8Q/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=15",
+      "sha256": "aedd4ae7b662a76276933aee9617d99809a1546ee2e91dffbd6a7051ad2c40aa",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-18.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1WtFPWIhMAGBPkpaEicT20mniakyE9IfStLsEicZc9rtME9N3FHSdvblNWg/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=17",
+      "sha256": "f35fbc7ac2870eba652b927e2d348a3ad0f3354673436a1ab88f4813128e2c86",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-rpa-ai-archive-image-19.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTA66vLnjyEFLnv8oq1In1W3mFfKicSwTN718zibr8PXiahLe1bDBRAAj8iaQjq27jI5VYrcswib18lsicw/640?wx_fmt=png&from=appmsg&watermark=1#imgIndex=18",
+      "sha256": "36df884f073ecda08d7d9c0bdb7273c5720a11bb87753807b26432a74060a5cd",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuS6om4IAqOViaMuBebukHT7Y2PGzeWG3zgHBN1yZ4yZBe6QAr4VkElNdAVN33rMgEnF1e4SL1xpd6Q/0?wx_fmt=jpeg",
+      "sha256": "0d5a1b96f706f16a796af403f1edebb8a1d950be9fedd4f7f96850bd5f36f223",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-image-01.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuTWOcGoTicfd2O58IoibRW1eULoGYGPlEm3gt3pMLRpDUOCaQsMMYyUkzEbqqNT7TDpVyznOQYXQZXg/640?wx_fmt=png&from=appmsg#imgIndex=0",
+      "sha256": "de9f88305eb1bffa5aaf3e0986c4aa85121716ae88329f4bd24b1238cefdcf80",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-image-03.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuS6om4IAqOViaMuBebukHT7YXQxmJUbcu0Mibb7gLZawibXwETQFZPJcjn3497uZOj4ibt9xTJaMLtTUQ/640?wx_fmt=png&from=appmsg#imgIndex=2",
+      "sha256": "056a9a6a0d52e36344515a338da337d77e0bf802836a0b350412f3f82371fc88",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-image-05.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuS6om4IAqOViaMuBebukHT7Y6ta9BAqSXbibynCIkCHF8wcV6wdnL5G9ZsmoR27dRusHUyHRMlMxmoA/640?wx_fmt=png&from=appmsg#imgIndex=4",
+      "sha256": "a919a1a60a3412c5c89c3e7f33a0fe232f85938aed7d98a8b1bcf7b7599ab0bf",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-image-06.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuS6om4IAqOViaMuBebukHT7YlfHB5s2OeFicLP2kiaR1nDjlibcxae7UsxKPlLnx9NL2TbOCcGppKLuyg/640?wx_fmt=jpeg#imgIndex=5",
+      "sha256": "88b7f242dd0c4c454b16e2e5cbb29928bdba08996b3ba6a225fe06da1de9faf7",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-image-07.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuS6om4IAqOViaMuBebukHT7YRqBFSqysWaENTYmrM4UVVy9cmaicbSfM3H6NIBUOCnnJmst8MgpiauVQ/640?wx_fmt=jpeg#imgIndex=6",
+      "sha256": "dd607b682484ab3a9aafad916793bb73e03abb7c2f253c88e56e27afc2488b46",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-pixels-and-heartbeats-image-08.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuS6om4IAqOViaMuBebukHT7YIIcuOHINBUciaQIvuSMXSibYhia48wYibmibS4WWib1apcgrJgn249iaBlFvQ/640?wx_fmt=jpeg#imgIndex=7",
+      "sha256": "404acb0ea7412e8241c4ffc67d97967b33aaafe404499e527092315b5633d341",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-deepseek-prompt-helper-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuRYVOcrbUsDePr0x7EnAuNtqnKPg9Jric8h9M3wRXFFsibRJSuTTwDNYDp6DMKmhERTwgDyiaOxQgPnA/0?wx_fmt=jpeg",
+      "sha256": "13c0deaef0baf9ca21a88f54679240e87e1b06662fa367ce80f34e45229dc75d",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-deepseek-prompt-helper-image-01.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuRYVOcrbUsDePr0x7EnAuNtK5qhzkcIS8KwYURicB15Ck3CPtYVG1uqh9NL63qxG5czkT4nQhjrwBA/640?wx_fmt=png#imgIndex=0",
+      "sha256": "07dbc3ba49569e2f1fd1bfb8a989adff1b4ea0069e96d53232db33974508d9fe",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-deepseek-prompt-helper-image-02.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuRYVOcrbUsDePr0x7EnAuNtORCxP3Vprp2haiccM6DYXIztP6jU9Q21mTN9YS4pTvgpV2MwuyFPdMw/640?wx_fmt=png#imgIndex=1",
+      "sha256": "81b57b732de6535b2f43df0b47913a7e63b56bfb14d25933f4a4f5d860d76ed9",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-deepseek-prompt-helper-image-03.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuRYVOcrbUsDePr0x7EnAuNtmPCobChFZeSf3Vft3F6eLnU1fZrKgicN8ibl3LoKibRQecfiavMTsV6efg/640?wx_fmt=png#imgIndex=2",
+      "sha256": "ef4941b9fbb8dda0756ab90ea01c35b4bf04f298a32684f6d92067dea5e7405f",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-deepseek-prompt-helper-image-04.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuRYVOcrbUsDePr0x7EnAuNtbMvP2SZuAoGGickUZHwv7sIdJEia8t9zTP6shcV9JJrhuVm0d3FjVicqg/640?wx_fmt=png#imgIndex=3",
+      "sha256": "407db965f7cd09dbfe4f47710fa9bb9b7818e73e16b67e962b1ce97e9d9a962c",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-order-anxiety-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuR98aFdO4MAtp2RQYOJQkH5MFwz6tDbVicajzJKlokNibVbgzxp7lpOwkQibPPCaf4jpqu9nspK6fvJQ/0?wx_fmt=jpeg",
+      "sha256": "e1210b40091ab953e4d89aa2e452193f367005e223d18994bac3f0a6a0a39610",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-order-anxiety-image-01.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuR98aFdO4MAtp2RQYOJQkH53XicDuVzTuexw0J5BWsUZkT8fsYRwSic24Nbicp2pETAGTw6n8pMPP6EA/640?wx_fmt=jpeg&from=appmsg#imgIndex=0",
+      "sha256": "f87bc4c1f0a35ec524feff4c8eed9593b547353180b497348b15e1475bade210",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-lantern-festival-smoke-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuTZ2v9ic1wIwc4ibiad1hljC4wjvwhK6utgyUpHXYI7JLaCl4gyuiaDMC6qdyD8rZkXu5mUEFOodNn5ZQ/0?wx_fmt=jpeg",
+      "sha256": "591998454a73fa140fdd6b56a6aa331b49f3c1adffcce5683140d4e90fb60ea9",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-think-beyond-today-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuR8LsJbt20oM1ODjmN6VTSdPET5wOIpJSsIrMAezBHkZVxPaOqT9NNlxScrvib0Gw9vuPqIwhNLmmA/0?wx_fmt=jpeg",
+      "sha256": "14b4d29b3438921f3ba5f143d119eae7df6ad51c0101ee968eb28f0ff664bf01",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-think-beyond-today-image-01.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuR8LsJbt20oM1ODjmN6VTSdiaqTCUIXMhS6X2UibKnIRN76DgicXexafoKRCgUiauhyGbFR1OPVQB75QQ/640?wx_fmt=jpeg#imgIndex=0",
+      "sha256": "2e6f13f3b039cde444855fc60282a82d70a608c99a0b1d3b47d9086864289466",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-start-before-ready-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuQBRef4mWlazmDKNz1gyPHiaby81IW0w3KyWFic6mBz1VsRibZCXg8JHQRm0A1FZsQ73V2hUhcmgZdOQ/0?wx_fmt=jpeg",
+      "sha256": "1f21bafcf8336061a3801cff92dc6888c941f3f0d0a3649174d68da19225a085",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-start-before-ready-image-01.png",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_png/Sx6VT3YqOuQBRef4mWlazmDKNz1gyPHia8sUaJqjr5Y5xJoKu0CZxX3hJIW7NOpq6jnCHo5mQKW2icic2KbNOBJBg/640?wx_fmt=png&from=appmsg#imgIndex=0",
+      "sha256": "72f28b2d26ffb4bffc101e75521c0807beba654981a72394c71da55a840e05a1",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-approval-trap-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuT1ElJrkNTag6tD6bTX5J3XGK0PicE2J3UZpzvr9syksHB3MHNBRR0LwrAheVtlsDre4CHJjPfF0zA/0?wx_fmt=jpeg",
+      "sha256": "8078395a0e57d7b53d6a072e17929a75368190cafebdd216b66c342e53859c67",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-approval-trap-image-01.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuT1ElJrkNTag6tD6bTX5J3XHNvDJ42VaFlnanHB7BH6mvTLMhBydGLDYE7oed59xqRjEROUBe2spA/640?wx_fmt=jpeg#imgIndex=0",
+      "sha256": "e15083716fac0bb01662146eb51301a424af83a50d0056f71741da235802297d",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-moment-of-realization-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuS5ibXkag13guTreMaNAibzCkpLN8MB70WicjJCnDQg9qyGxGLycGoFWLkibzKuYFAdc9ZEhsfgAZozNg/0?wx_fmt=jpeg",
+      "sha256": "c373427dc40062e239f83d94a9555f94ffd651fe16b9188b863e399b39300d40",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-upside-down-world-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuQ5pVXKV4BlbibwIh1sicjwSwMnwsvPPWQb4xwJX6IXu6JzKMySGRmu54ZgQqKISCiaticic23knoluSpQ/0?wx_fmt=jpeg",
+      "sha256": "cd6aa82f16c36e102c0907c6e9a92cdbf558c15d0fedfbce20098959e80b2412",
+      "visionChecked": true
+    },
+    {
+      "file": "/content/wechat/wechat-meet-on-a-better-summit-cover.jpg",
+      "sourceUrl": "https://mmbiz.qpic.cn/mmbiz_jpg/Sx6VT3YqOuRDADnZvjVYonsD1RfIY6sm9JA8KM6jAHAX80AGoEceD7heEtibZ3kj0qT1dsJf9OYZbQmsOThjwbA/0?wx_fmt=jpeg",
+      "sha256": "5b180f9acfc970e5c59314d44d05cf7f566484feed9cae07255b32512bdd5e62",
+      "visionChecked": true
+    }
+  ]
+}

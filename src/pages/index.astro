@@ -11,7 +11,7 @@ import { homeCover, homeTopics } from '../lib/home';
 import { getWorks } from '../lib/work';
 
 // 编辑选读，不声称按时间排序。标题、简介、图片、发布日期均来自内容库。
-const readingIds = ['dawdex-adventurex', 'deepseek-roleplay', 'mac-autofill', 'meme-art-origin', 'ai-phone-credit', 'ai-writing-on-x'];
+const readingIds = ['dawdex-adventurex', 'wechat-rpa-ai-archive', 'wechat-gr3-companion', 'meme-art-origin', 'ai-phone-credit', 'ai-writing-on-x'];
 const reading = readingIds.flatMap((id) => {
 	const item = library.find((entry) => entry.id === id && entry.format !== 'video');
 	return item ? [item] : [];
@@ -65,7 +65,7 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 		</section>
 
 		<section class="last-page" id="contact" aria-labelledby="last-page-title">
-			<div class="closing-note"><p class="section-kicker">04 / 页末 · 找到我</p><h2 id="last-page-title">内容散落，<br />在这里放好。</h2><p>从 AI 的一次实测，到一个不顺手的界面，再到自己做的小工具。原来的笔记、短句和视频，在这里一起翻。</p><a href="/about/">再认识一下禾冉 →</a></div>
+			<div class="closing-note"><p class="section-kicker">04 / 页末 · 找到我</p><h2 id="last-page-title">内容散落，<br />在这里放好。</h2><p>从 AI 的一次实测，到一个不顺手的界面，再到自己做的小工具。公众号文章、笔记、短句和视频，在这里一起翻。</p><a href="/about/">再认识一下禾冉 →</a></div>
 			<div class="closing-links"><AccountCards /><div class="contact-line"><span>有想聊的？写封邮件。</span><a href={`mailto:${profile.email}`}>{profile.email}</a><button class="copy" type="button" data-copy={profile.email}>复制邮箱</button></div></div>
 		</section>
 	</div>
