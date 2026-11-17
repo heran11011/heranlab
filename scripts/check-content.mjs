@@ -139,6 +139,12 @@ const homeHTML = await readFile(path.join(root, 'dist/index.html'), 'utf8');
 const home = homeHTML.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
 assert.ok(home, 'Homepage main missing');
 assert.ok(home.includes('data-paper-deck') && home.includes('data-chapter-tabs'), 'Personal desk interactions missing');
+// 核心纸签直接展示，不能在手机上退回到需要点开的折叠入口。
+assert.match(home, /<div\b(?=[^>]*\bdata-desk-play\b)(?![^>]*\bhidden\b)[^>]*>/, 'Paper deck must have a visible, non-collapsible wrapper');
+assert.ok(!/<details\b[^>]*\bdata-desk-play\b/.test(home), 'Paper deck must not be behind a disclosure');
+assert.ok(!home.includes('桌上有一叠纸签') && !home.includes('点开翻翻'), 'Obsolete paper-deck disclosure prompt');
+const firstPaperTag = home.match(/<article\b[^>]*\bdata-desk-paper\b[^>]*>/)?.[0];
+assert.ok(firstPaperTag && !/\bhidden\b/.test(firstPaperTag), 'First paper must be visible without JavaScript');
 for (const id of ids) assert.ok(home.includes(`/content/${id}/`), `Desk paper missing: ${id}`);
 assert.ok(home.includes('/content/dawdex-adventurex/'), 'Lead content missing on homepage');
 assert.ok(home.includes('/content/dawdex-video/'), 'Video content missing on homepage');
@@ -146,4 +152,4 @@ assert.ok(home.includes('/content/early-video-regret/'), 'Second video missing o
 assert.ok((home.match(/<img\b/g) || []).length >= 5, 'Homepage has lost its image-led layout');
 assert.ok(!home.includes('截图待补') && !home.includes('照片待补'), 'Placeholder images must not lead the homepage');
 const checked = await checkGenerated(path.join(root, 'dist'));
-console.log(`PASS: personal desk, original paragraphs, reader tools and image viewer; image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);
+console.log(`PASS: always-visible paper deck, personal desk, original paragraphs, reader tools and image viewer; image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);
