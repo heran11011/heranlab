@@ -1,6 +1,7 @@
 ---
 import { libraryFormats, platformLabels } from '../../data/library';
 import type { LibraryItem } from '../../data/library';
+import { homeCover } from '../../lib/home';
 
 interface Props {
 	item: LibraryItem;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { item, index, lead = false } = Astro.props;
+const cover = homeCover(item);
 const platform = platformLabels[item.platform];
 const format = libraryFormats[item.format];
 const searchText = [item.title, item.topic, item.excerpt, platform, format].join(' ');
@@ -17,16 +19,16 @@ const videoSourceLabel = item.platform === 'xiaohongshu' ? '小红书原视频' 
 ---
 
 <article
-	class:list={['library-card', { 'library-card--lead': lead, 'library-card--illustrated': !!item.cover }]}
+	class:list={['library-card', { 'library-card--lead': lead, 'library-card--illustrated': !!cover, 'library-card--offset': index > 0 && index % 2 === 0 }]}
 	data-library-item
 	data-platform={item.platform}
 	data-search={searchText}
 >
-	{item.cover && (
-		<div class="library-card-cover">
-			<img src={item.cover} alt={`“${item.title}”的配图`} loading="lazy" decoding="async" />
+	{cover && (
+		<a class="library-card-cover" href={`/content/${item.id}/`} aria-label={`翻阅：${item.title}`}>
+			<img src={cover.src} width={cover.width} height={cover.height} alt={`“${item.title}”的配图`} loading="lazy" decoding="async" />
 			{item.format === 'video' && <span class="library-video-label">视频 · {videoPlaybackLabel}</span>}
-		</div>
+		</a>
 	)}
 	<div class="library-card-copy">
 		<div class="library-card-topline">
@@ -49,55 +51,69 @@ const videoSourceLabel = item.platform === 'xiaohongshu' ? '小红书原视频' 
 </article>
 
 <style>
-	.library-card {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		min-width: 0;
-		border: 1px solid var(--rule);
-		border-radius: var(--r);
-		background: var(--paper-2);
-		box-shadow: 0 2px 0 -1px var(--rule);
-		transition: border-color 0.2s ease, transform 0.2s ease;
-	}
-	.library-card:not(.library-card--illustrated) .library-card-copy { min-height: 320px; }
-	.library-card-cover { position: relative; border-bottom: 1px solid var(--rule); overflow: hidden; border-radius: var(--r) var(--r) 0 0; }
-	.library-card-cover img { width: 100%; height: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; }
-	.library-video-label { position: absolute; left: 14px; bottom: 14px; max-width: calc(100% - 28px); padding: 4px 9px; background: var(--paper-2); color: var(--ink); font-family: var(--mono); font-size: 11px; border: 1px solid var(--rule); }
-	.library-card-copy { display: flex; flex: 1; flex-direction: column; min-width: 0; padding: 24px; }
-	.library-card-topline { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.03em; color: var(--ink-2); }
+	.library-card { position: relative; display: flex; flex-direction: column; min-width: 0; }
+	.library-card--offset { margin-top: calc(var(--unit, 14px) * 3); }
+	.library-card-cover { position: relative; display: block; padding: 7px; background: var(--paper-2); border: 1px solid var(--rule); box-shadow: var(--shadow-paper, 0 12px 28px -24px var(--ink)); transition: transform var(--motion-ui, 240ms) var(--decel), box-shadow var(--motion-ui, 240ms) ease; }
+	/* 保留配图完整比例；长图与横向封面不被裁成同一种商品卡。 */
+	.library-card-cover img { width: 100%; height: auto; max-height: 448px; object-fit: contain; background: var(--paper-3); }
+	.library-video-label { position: absolute; left: 14px; bottom: 14px; max-width: calc(100% - 28px); padding: 4px 9px; background: var(--paper-2); color: var(--ink); font: 11px/1.6 var(--mono); border: 1px solid var(--rule); }
+	.library-card-copy { display: flex; flex-direction: column; min-width: 0; padding: 21px 0 7px; border-bottom: 1px solid var(--rule); }
+	.library-card-topline { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; font: 11px/1.8 var(--mono); letter-spacing: 0.03em; color: var(--ink-2); }
 	.library-card-platform { overflow-wrap: anywhere; }
-	.library-card-number { flex: none; color: var(--ink-2); }
-	.library-card-topic { margin: 22px 0 9px; font-size: 12px; color: var(--accent); }
-	.library-card h3 { margin: 0; font-family: var(--serif-zh); font-size: clamp(23px, 2.3vw, 29px); font-weight: 400; line-height: 1.4; text-wrap: pretty; overflow-wrap: anywhere; }
+	.library-card-number { flex: none; color: var(--accent); font: 24px/1 var(--serif-en); }
+	.library-card-topic { margin: 14px 0 7px; font: 11px/1.8 var(--mono); color: var(--accent); }
+	.library-card h3 { margin: 0; font: 400 clamp(24px, 2.5vw, 32px)/1.4 var(--serif-zh); text-wrap: pretty; overflow-wrap: anywhere; }
 	.library-card h3 a { text-decoration: none; }
 	.library-card h3 a:hover { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
-	.library-card-excerpt { margin: 16px 0 0; font-size: 14px; color: var(--ink-2); line-height: 1.85; text-wrap: pretty; overflow-wrap: anywhere; }
-	.library-card-date { margin: 16px 0 0; font-family: var(--mono); font-size: 11px; color: var(--ink-2); }
-	.library-card-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: auto; padding-top: 24px; font-size: 13px; }
-	.library-card-actions a { display: inline-flex; align-items: center; gap: 9px; min-height: 32px; color: var(--ink-2); text-decoration: none; text-underline-offset: 4px; }
+	.library-card-excerpt { max-width: 38em; margin: 14px 0 0; font-size: 14px; color: var(--ink-2); line-height: 1.85; text-wrap: pretty; overflow-wrap: anywhere; }
+	.library-card-date { margin: 14px 0 0; font: 10px/1.8 var(--mono); color: var(--ink-2); }
+	.library-card-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 7px 14px; padding-top: 14px; font-size: 12px; }
+	.library-card-actions a { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; color: var(--ink-2); text-decoration: none; text-underline-offset: 4px; }
 	.library-card-actions a:hover { text-decoration: underline; color: var(--accent); }
 	.library-card-actions .library-card-read { color: var(--accent); }
-	.library-card a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; border-radius: 2px; }
-	.library-card--lead { grid-column: 1 / -1; border-top: 3px solid var(--ink); }
-	.library-card--lead .library-card-copy { padding: clamp(24px, 3vw, 38px); }
-	.library-card--lead h3 { font-size: clamp(29px, 3.5vw, 42px); max-width: 24em; }
-	.library-card--lead .library-card-excerpt { max-width: 48em; font-size: 15px; }
-	.library-card--lead.library-card--illustrated { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
-	.library-card--lead .library-card-cover { border-bottom: 0; border-right: 1px solid var(--rule); border-radius: 0 0 0 var(--r); }
-	.library-card--lead .library-card-cover img { aspect-ratio: auto; min-height: 100%; max-height: 520px; }
+	.library-card a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+	.library-card:not(.library-card--illustrated) { padding: 28px; background: var(--paper-2); border-top: 1px solid var(--ink-2); box-shadow: var(--shadow-paper, 0 12px 28px -24px var(--ink)); }
+	.library-card:not(.library-card--illustrated) .library-card-copy { padding-top: 0; border-bottom: 0; }
+	.library-card:not(.library-card--illustrated) h3 { margin-top: 7px; }
+	.library-card--lead { grid-column: 1 / -1; margin-bottom: 14px; }
+	.library-card--lead.library-card--illustrated { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
+	.library-card--lead .library-card-copy { padding-top: 14px; }
+	.library-card--lead h3 { font-size: clamp(30px, 3.5vw, 42px); }
+	.library-card--lead .library-card-excerpt { font-size: 15px; }
+	.library-card--lead .library-card-cover img { max-height: 490px; }
+
+	/* 目录与图文使用同一份条目与筛选，不复制内容或产生第二套搜索结果。 */
+	:global(content-library[data-view='catalog']) .library-card { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 28px; margin: 0; padding: 21px 0; border: 0; border-bottom: 1px solid var(--rule); background: transparent; box-shadow: none; }
+	:global(content-library[data-view='catalog']) .library-card-cover { align-self: start; padding: 4px; box-shadow: none; }
+	:global(content-library[data-view='catalog']) .library-card-cover img { height: 84px; object-fit: contain; }
+	:global(content-library[data-view='catalog']) .library-video-label { display: none; }
+	:global(content-library[data-view='catalog']) .library-card-copy { grid-column: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; padding: 0; border: 0; }
+	:global(content-library[data-view='catalog']) .library-card-topline { grid-column: 1 / -1; margin-bottom: 7px; }
+	:global(content-library[data-view='catalog']) .library-card-topic { grid-column: 1; margin: 0 0 7px; }
+	:global(content-library[data-view='catalog']) .library-card h3 { grid-column: 1; margin: 0; font-size: clamp(21px, 2.4vw, 28px); }
+	:global(content-library[data-view='catalog']) .library-card-excerpt { grid-column: 1; margin-top: 7px; font-size: 13px; }
+	:global(content-library[data-view='catalog']) .library-card-date { grid-column: 1; margin-top: 7px; }
+	:global(content-library[data-view='catalog']) .library-card-actions { grid-column: 2; grid-row: 2 / 6; align-self: center; flex-direction: column; gap: 0; padding: 0 0 0 28px; }
 	@media (hover: hover) and (pointer: fine) {
-		.library-card:hover { border-color: var(--ink-2); transform: translateY(-2px); }
+		.library-card-cover:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift, 0 18px 30px -24px var(--ink)); }
+		:global(content-library[data-view='catalog']) .library-card-cover:hover { transform: none; }
 	}
 	@media (max-width: 760px) {
-		.library-card--lead.library-card--illustrated { display: flex; }
-		.library-card--lead .library-card-cover { border-right: 0; border-bottom: 1px solid var(--rule); border-radius: 0; }
-		.library-card--lead .library-card-cover img { aspect-ratio: 16 / 10; min-height: 0; max-height: none; }
+		.library-card--offset { margin-top: 0; }
+		.library-card--lead.library-card--illustrated { display: flex; gap: 0; }
+		.library-card--lead .library-card-copy { padding-top: 21px; }
+		.library-card h3 { font-size: 26px; }
+		.library-card--lead h3 { font-size: 30px; }
+		.library-card:not(.library-card--illustrated) { padding: 21px; }
+		:global(content-library[data-view='catalog']) .library-card { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
+		:global(content-library[data-view='catalog']) .library-card-cover img { height: 56px; }
+		:global(content-library[data-view='catalog']) .library-card-copy { display: flex; }
+		:global(content-library[data-view='catalog']) .library-card-actions { align-self: stretch; flex-direction: row; justify-content: space-between; padding: 7px 0 0; gap: 7px; }
+		:global(content-library[data-view='catalog']) .library-card:not(.library-card--illustrated) .library-card-copy { grid-column: 1 / -1; }
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.library-card { transition: none; }
-		.library-card:hover { transform: none; }
+		.library-card-cover { transition: none; }
+		.library-card-cover:hover { transform: none; }
 	}
-	/* Astro 会给双 class 选择器重复加 scope，提高其优先级；hidden 必须明确胜出。 */
 	.library-card[hidden] { display: none !important; }
 </style>

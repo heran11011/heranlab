@@ -23,15 +23,19 @@ const imageURL = image ? new URL(image.src, Astro.site).href : undefined;
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-6K0DQ1M668"></script>
+<!-- 仅正式域名统计；本地设计预览和分支预览不发送分析请求。 -->
 <script is:inline>
-	window.dataLayer = window.dataLayer || [];
-	function gtag() {
-		dataLayer.push(arguments);
-	}
-	gtag('js', new Date());
-	gtag('config', 'G-6K0DQ1M668');
+	(() => {
+		if (!['heranlab.com', 'www.heranlab.com'].includes(location.hostname)) return;
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { window.dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-6K0DQ1M668');
+		const script = document.createElement('script');
+		script.async = true;
+		script.src = 'https://www.googletagmanager.com/gtag/js?id=G-6K0DQ1M668';
+		document.head.appendChild(script);
+	})();
 </script>
 
 <!-- 原头像透明圆角方形；与站内头像保持同一圆角比例，版本参数刷新页签缓存 -->

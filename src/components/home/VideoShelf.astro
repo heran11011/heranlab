@@ -69,21 +69,21 @@ const { items } = Astro.props;
 </script>
 
 <style>
-	.screening { scroll-margin-top: 64px; margin-top: 62px; padding: 34px 0 40px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+	.screening { scroll-margin-top: 126px; margin-top: 84px; padding: 42px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
 	.shelf-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; }
 	.shelf-kicker { margin: 0 0 6px; color: var(--accent); font-size: 12px; }
 	h2 { font: 400 30px/1.3 var(--serif-zh); margin: 0; }
-	h2 em { font: 400 40px/.8 var(--serif-en); color: var(--accent); opacity: .65; margin-right: 14px; }
+	h2 em { font: 400 48px/.8 var(--serif-en); color: var(--accent); margin-right: 14px; }
 	h2 span { font: 12px var(--mono); color: var(--ink-2); margin-left: 14px; white-space: nowrap; }
 	.shelf-intro { font-size: 14px; color: var(--ink-2); margin: 12px 0 20px; }
 	.shelf-controls { display: flex; gap: 8px; }
 	.shelf-controls[hidden] { display: none; }
-	.shelf-controls button { width: 42px; height: 42px; border: 1px solid var(--rule); border-radius: 50%; background: var(--paper-2); color: var(--ink); font: 18px var(--sans); cursor: pointer; transition: background 180ms ease-out; }
+	.shelf-controls button { width: 44px; height: 44px; border: 1px solid var(--rule); border-radius: 2px; background: var(--paper-2); color: var(--ink); font: 18px var(--sans); cursor: pointer; transition: background var(--motion-fast) var(--decel); }
 	.shelf-controls button:hover:not(:disabled) { background: var(--accent); color: var(--paper); border-color: var(--accent); }
 	.shelf-controls button:disabled { opacity: .4; cursor: default; }
-	.video-rail { display: flex; gap: 22px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px 4px 22px; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+	.video-rail { display: flex; gap: 28px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 21px 14px 28px; background: color-mix(in srgb, var(--paper-3) 48%, transparent); border-block: 1px dashed var(--rule); scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 	.video-entry { flex: 0 0 min(76%, 460px); min-width: 0; scroll-snap-align: start; scroll-margin-inline: 4px; display: flex; flex-direction: column; }
-	.video-image { display: block; position: relative; overflow: hidden; background: var(--paper-2); border: 1px solid var(--rule); border-radius: 3px; }
+	.video-image { display: block; position: relative; overflow: hidden; background: var(--paper-2); border: 7px solid var(--paper-2); border-radius: 1px; box-shadow: var(--shadow-paper); }
 	.video-image img { width: 100%; aspect-ratio: 16 / 9; height: auto; object-fit: contain; transition: transform 260ms cubic-bezier(0, 0, .2, 1); }
 	.play-mark { position: absolute; bottom: 14px; left: 14px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--paper-2); color: var(--accent); font-size: 16px; padding-left: 2px; }
 	.video-copy { padding: 16px 2px 0; display: flex; flex-direction: column; flex: 1; }
@@ -93,8 +93,8 @@ const { items } = Astro.props;
 	h3 a { text-decoration: none; }
 	.video-excerpt { font-size: 14px; color: var(--ink-2); margin: 10px 0 16px; }
 	.video-actions { display: flex; gap: 22px; margin-top: auto; font-size: 13px; }
-	.video-actions a { color: var(--accent); text-decoration: none; min-height: 38px; display: inline-flex; align-items: center; }
-	.video-entry--text { border: 1px solid var(--rule); border-radius: 12px; background: var(--paper-2); padding: 26px; }
+	.video-actions a { color: var(--accent); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+	.video-entry--text { border: 1px solid var(--rule); border-radius: 1px; background: var(--paper-2); padding: 28px; }
 	.video-entry--text .video-copy { padding: 0; }
 	.text-label { font: 12px var(--mono); color: var(--accent); margin: 40px 0 12px; }
 	.video-entry--text h3 { font-size: 30px; }
@@ -102,7 +102,8 @@ const { items } = Astro.props;
 	a:focus-visible, button:focus-visible, .video-rail:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 	@media (hover: hover) and (pointer: fine) { .video-image:hover img { transform: scale(1.02); } }
 	@media (max-width: 700px) {
-		.screening { margin-top: 40px; padding-top: 28px; }
+		.screening { margin-top: 56px; padding-top: 28px; }
+		h2 em { font-size: 38px; margin-right: 7px; }
 		h2 span { display: block; margin: 8px 0 0; }
 		.video-entry { flex-basis: 86%; }
 		.video-entry--text { padding: 22px; }

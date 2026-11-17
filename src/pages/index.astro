@@ -26,23 +26,24 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 ---
 
 <Base description={description}>
-	<div class="home-page">
+	<div class="home-page" data-scrapbook="scattered">
 		<DeskIntro />
 		<ChapterTabs />
 
 		<section class="reading-room" id="writing" aria-labelledby="reading-title" data-home-reading>
 			<header class="reading-heading">
-				<h2 id="reading-title"><span class="chapter-number" aria-hidden="true">01</span> 图文随记</h2>
-				<a href="/content/">全部 {library.length} 条内容 <span aria-hidden="true">→</span></a>
+				<div><p class="section-kicker">SELECTED PAGES / 选读</p><h2 id="reading-title"><span class="chapter-number" aria-hidden="true">01</span> 图文随记</h2></div>
+				<a href="/content/">翻整本剪报册 <span class="content-total">{library.length}</span> <span aria-hidden="true">↗</span></a>
 			</header>
 			<div class="reading-tools" hidden>
 				<div class="topic-buttons" role="group" aria-label="筛选图文与短句主题">
 					{homeTopics.map((topic) => <button type="button" data-home-topic={topic} aria-pressed={topic === '全部' ? 'true' : 'false'} aria-controls="home-reading-grid">{topic}</button>)}
 				</div>
-				<p class="reading-count" aria-live="polite" aria-atomic="true">选读 {reading.length} 篇图文与短句</p>
+				<div class="reading-order" role="group" aria-label="整理这页封面的摆放方式"><span>这页怎么放</span><button type="button" data-scrapbook-order="scattered" aria-pressed="true">散着贴</button><button type="button" data-scrapbook-order="aligned" aria-pressed="false">排整齐</button></div>
 			</div>
+			<p class="reading-count" aria-live="polite" aria-atomic="true">选读 {reading.length} 篇图文与短句</p>
 			<div class="reading-grid" id="home-reading-grid">
-				{reading.map((item, index) => <HomeEntry item={item} variant={variants[index]} />)}
+				{reading.map((item, index) => <HomeEntry item={item} variant={variants[index]} number={index + 1} />)}
 			</div>
 			<noscript><p class="no-script-note">图文与短句已全部展开，视频在下面的放映架。</p></noscript>
 		</section>
@@ -78,7 +79,18 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 		const count = room.querySelector<HTMLElement>('.reading-count');
 		const buttons = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-home-topic]'));
 		const entries = Array.from(room.querySelectorAll<HTMLElement>('[data-home-entry]'));
-		if (!tools || !grid || !count) return;
+		const page = room.closest<HTMLElement>('.home-page');
+		const orders = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-scrapbook-order]'));
+		if (!tools || !grid || !count || !page) return;
+		const arrange = (order: string) => {
+			page.dataset.scrapbook = order === 'aligned' ? 'aligned' : 'scattered';
+			orders.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.scrapbookOrder === page.dataset.scrapbook)));
+		};
+		try { arrange(localStorage.getItem('heran-scrapbook-order') || 'scattered'); } catch {}
+		orders.forEach((button) => button.addEventListener('click', () => {
+			arrange(button.dataset.scrapbookOrder || 'scattered');
+			try { localStorage.setItem('heran-scrapbook-order', page.dataset.scrapbook!); } catch {}
+		}));
 		buttons.forEach((button) => button.addEventListener('click', () => {
 			const topic = button.dataset.homeTopic;
 			buttons.forEach((entry) => entry.setAttribute('aria-pressed', String(entry === button)));
@@ -91,22 +103,28 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 </script>
 
 <style>
-	.home-page { padding-bottom: 20px; --home-ease: var(--decel); }
-	.home-page :is(section[id]) { scroll-margin-top: 64px; }
-	.chapter-number { display: inline-block; margin-right: 14px; font: 400 40px/.8 var(--serif-en); color: var(--accent); opacity: .65; }
-	.reading-room { padding-top: 22px; }
+	.home-page { padding-bottom: 28px; --home-ease: var(--decel); }
+	.home-page :is(section[id]) { scroll-margin-top: 126px; }
+	.chapter-number { display: inline-block; margin-right: 14px; font: 400 48px/.8 var(--serif-en); color: var(--accent); }
+	.reading-room { padding-top: 28px; }
+	.content-total { margin-inline: 7px; color: var(--accent); font: 18px var(--serif-en); }
+	.reading-order { display: flex; align-items: center; gap: 2px; flex: none; }
+	.reading-order > span { color: var(--ink-3); font: 10px var(--mono); margin-right: 7px; }
+	.reading-order button { min-height: 44px; padding: 0 10px; cursor: pointer; border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--ink-2); font: 11px var(--sans); }
+	.reading-order button[aria-pressed='true'] { color: var(--accent); border-bottom-color: var(--accent); }
+	.reading-order button:hover { color: var(--ink); }
 	.reading-heading, .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
 	h2 { font: 400 30px/1.3 var(--serif-zh); margin: 0; }
 	.reading-heading h2 { font-size: 28px; }
 	.reading-heading > a, .section-heading > a { font-size: 12px; color: var(--ink-2); text-decoration: none; }
-	.reading-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 22px; }
+	.reading-tools { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 21px 0 7px; border-bottom: 1px solid var(--rule); padding-bottom: 7px; }
 	.reading-tools[hidden] { display: none; }
 	.topic-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-	.topic-buttons button { font: 13px var(--sans); cursor: pointer; min-height: 44px; padding: 0 14px; border: 1px solid transparent; border-radius: 22px; background: transparent; color: var(--ink-2); transition: background 180ms var(--home-ease), color 180ms var(--home-ease); }
-	.topic-buttons button[aria-pressed='true'] { color: var(--paper-2); background: var(--accent); }
+	.topic-buttons button { font: 12px var(--sans); cursor: pointer; min-height: 44px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--ink-2); transition: background var(--motion-fast) var(--home-ease), color var(--motion-fast) var(--home-ease); }
+	.topic-buttons button[aria-pressed='true'] { color: var(--accent); background: var(--paper-3); }
 	.topic-buttons button:hover:not([aria-pressed='true']) { background: var(--paper-3); color: var(--ink); }
-	.reading-count { font: 11px/1.5 var(--mono); margin: 0; color: var(--ink-2); }
-	.reading-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 24px 32px; margin-top: 22px; align-items: start; }
+	.reading-count { font: 10px/1.6 var(--mono); margin: 0 0 28px; padding-top: 7px; color: var(--ink-3); }
+	.reading-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 28px 56px; margin-top: 14px; align-items: start; }
 	.reading-grid[data-filtered='true'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	.reading-grid[data-filtered='true'] > :global(.entry) { grid-column: auto; grid-row: auto; }
 	.reading-grid[data-filtered='true'] > :global(.entry--lead) { grid-column: 1 / -1; max-width: 760px; }
@@ -125,11 +143,12 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 	.last-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 64px; padding: 40px 0 52px; border-top: 1px solid var(--rule); }
 	.closing-note h2 { font-size: 32px; line-height: 1.4; }
 	.closing-note > p:not(.section-kicker) { max-width: 29em; font-size: 14px; color: var(--ink-2); margin: 18px 0; }
-	.closing-note > a { font-size: 13px; color: var(--accent); text-decoration: none; display: inline-flex; min-height: 38px; align-items: center; }
+	.closing-note > a { font-size: 13px; color: var(--accent); text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; }
 	.closing-links { min-width: 0; padding-top: 4px; }
 	.contact-line { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; padding-top: 24px; margin-top: 24px; border-top: 1px dashed var(--rule); }
 	.contact-line > span { width: 100%; font-size: 12px; color: var(--ink-2); }
-	.contact-line > a { font: 14px/1.8 var(--mono); color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
+	.contact-line > a { display: inline-flex; align-items: center; min-height: 44px; font: 14px/1.8 var(--mono); color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
+	.contact-line .copy { min-height: 44px; min-width: 44px; }
 	.home-page a:focus-visible, .home-page button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 	.reading-heading a:hover, .section-heading a:hover, .closing-note a:hover, .contact-line a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
 	@media (max-width: 1000px) {
@@ -137,7 +156,12 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 		.last-page { gap: 32px; }
 	}
 	@media (max-width: 700px) {
-		.reading-tools { display: block; }
+		.reading-tools { display: flex; align-items: flex-start; flex-direction: column; gap: 0; }
+		.reading-order { align-self: flex-end; }
+		.reading-heading { align-items: flex-end; }
+		.reading-heading > a { max-width: 105px; text-align: right; line-height: 1.8; }
+		.reading-heading h2 { font-size: 26px; }
+		.chapter-number { font-size: 38px; margin-right: 7px; }
 		.topic-buttons { gap: 3px; }
 		.topic-buttons button { padding: 0 12px; }
 		.reading-count { margin-top: 10px; }

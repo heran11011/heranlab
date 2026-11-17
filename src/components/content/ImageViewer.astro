@@ -70,12 +70,15 @@ const { src, alt, caption = '原文配图', videoUrl, videoLabel = '播放视频
 <style>
 	image-viewer { display: block; min-width: 0; }
 	figure { margin: 0; }
-	.image-preview { position: relative; background: var(--reader-wash); }
-	.image-preview :global(img) { width: 100%; max-height: 420px; object-fit: contain; border: 0; border-radius: 0; }
+	.image-preview { position: relative; padding: 7px; border: 1px solid var(--reader-rule); background: var(--paper-2); box-shadow: var(--shadow-paper, 0 12px 28px -24px var(--ink)); }
+	.image-preview :global(img) { width: 100%; max-height: 448px; object-fit: contain; border: 0; border-radius: 0; background: var(--reader-wash); }
 	.image-open { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; background: transparent; color: var(--reader-ink); cursor: zoom-in; }
-	.image-caption-open { min-height: 44px; min-width: 80px; padding: 8px; border: 0; background: transparent; color: var(--reader-accent); font: 11px var(--sans); cursor: zoom-in; }
+	.image-caption-open { min-height: 44px; min-width: 88px; padding: 7px; border: 0; background: transparent; color: var(--reader-accent); font: 12px/1.6 var(--sans); cursor: zoom-in; transition: background var(--motion-fast, 160ms) ease; }
+	.image-caption-open:hover { background: var(--reader-wash); }
+	.image-caption-open:focus-visible, .image-open:focus-visible { outline: 2px solid var(--reader-accent); outline-offset: 4px; }
 	.image-open[hidden], .image-caption-open[hidden], [data-image-original][hidden] { display: none; }
-	figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 12px; align-items: center; margin-top: 4px; color: var(--reader-muted); font: 11px/1.6 var(--mono); }
+	figcaption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0 14px; align-items: center; margin-top: 7px; padding-bottom: 7px; border-bottom: 1px solid var(--reader-rule); color: var(--reader-muted); font: 10px/1.8 var(--mono); }
+	figcaption > span { min-width: 0; overflow-wrap: anywhere; }
 	figcaption a { display: inline-flex; align-items: center; min-height: 44px; color: var(--reader-accent); text-decoration: none; }
 	figcaption a:hover { text-decoration: underline; text-underline-offset: 4px; }
 	.is-video .image-preview :global(img) { aspect-ratio: 16 / 9; max-height: 360px; }
@@ -84,16 +87,19 @@ const { src, alt, caption = '原文配图', videoUrl, videoLabel = '播放视频
 	.image-play-symbol { font-size: 18px; }
 	dialog { position: fixed; inset: 0; margin: auto; padding: 16px; width: 100vw; max-width: none; height: 100dvh; max-height: none; border: 0; background: transparent; color: var(--reader-ink); overflow: auto; }
 	dialog::backdrop { background: rgba(17, 22, 18, 0.88); }
-	.image-dialog-sheet { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; padding: 60px 12px 12px; background: var(--reader-paper); }
+	.image-dialog-sheet { position: relative; width: fit-content; max-width: 100%; margin: 0 auto; padding: 70px 14px 14px; border: 1px solid var(--reader-rule); background: var(--reader-paper); box-shadow: var(--shadow-lift, 0 18px 30px -24px var(--ink)); }
 	.image-dialog-sheet img { max-width: 100%; max-height: calc(100dvh - 160px); width: auto; height: auto; margin-inline: auto; object-fit: contain; }
 	[data-image-close] { position: absolute; right: 12px; top: 8px; min-height: 44px; min-width: 72px; padding: 8px 12px; border: 1px solid var(--reader-rule); background: var(--reader-paper); color: var(--reader-ink); font: 14px var(--sans); cursor: pointer; }
 	.image-dialog-sheet p { margin: 12px 0 0; color: var(--reader-muted); font: 12px/1.6 var(--sans); }
 	.image-dialog-sheet a { display: inline-flex; min-height: 44px; align-items: center; color: var(--reader-accent); }
 	@media (max-width: 760px) {
-		.image-preview :global(img) { max-height: 190px; }
-		.is-video .image-preview :global(img) { max-height: 220px; }
+		.image-preview :global(img) { max-height: 280px; }
+		.is-video .image-preview :global(img) { max-height: 280px; }
 		.image-video-play { left: 10px; bottom: 10px; min-height: 44px; padding: 8px 12px; font-size: 12px; }
 		dialog { padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.image-caption-open { transition: none; }
 	}
 	@media print {
 		.image-open, .image-caption-open, dialog { display: none !important; }

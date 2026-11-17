@@ -8,7 +8,7 @@
 	--paper-3: #ebe7db; /* 命令块、占位图底 */
 	--ink: #23251f;
 	--ink-2: #5f6058; /* 次要文字 */
-	--ink-3: #707064; /* 标签、日期：小字号仍需清楚可读 */
+	--ink-3: #68685d; /* 标签、日期：小字号仍需清楚可读 */
 	--rule: #dad5c7;
 	--accent: #a24f35; /* 陶土色：像纸上的批注，而非产品导航 */
 	--marker: #f1e07a; /* 荧光笔：全站只用一两处 */
@@ -24,13 +24,19 @@
 	--avatar-radius: 16.6667%; /* 头像与页签统一为圆角方形 */
 	--top: 60px;
 	--spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-	--decel: cubic-bezier(0, 0, 0.2, 1);
+	--decel: cubic-bezier(0.16, 1, 0.3, 1);
+	--unit: 14px;
+	--motion-fast: 160ms;
+	--motion-ui: 240ms;
+	--motion-paper: 680ms;
+	--shadow-paper: 0 2px 3px -2px color-mix(in srgb, var(--ink) 22%, transparent), 0 14px 32px -22px color-mix(in srgb, var(--ink) 35%, transparent);
+	--shadow-lift: 0 22px 34px -12px color-mix(in srgb, var(--ink) 22%, transparent);
 }
 
 /* 借鉴参考页的阅读配色：只换色彩角色，不改变内容与排版。 */
 :root[data-tone='forest'] {
 	--paper: #eff3eb; --paper-2: #f7faf4; --paper-3: #dfe8d8;
-	--ink: #253a2c; --ink-2: #52634f; --ink-3: #67775e;
+	--ink: #253a2c; --ink-2: #52634f; --ink-3: #5d6b54;
 	--rule: #cbd7c1; --accent: #486648; --marker: #d9dda0;
 }
 :root[data-tone='night'] {
@@ -49,7 +55,7 @@ main:focus { outline: none; }
 body {
 	margin: 0;
 	background-color: var(--paper);
-	background-image: radial-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+	background-image: radial-gradient(color-mix(in srgb, var(--ink) 4%, transparent) .7px, transparent .7px);
 	background-size: 22px 22px;
 	color: var(--ink);
 	font: 16px/1.7 var(--sans);
@@ -77,7 +83,9 @@ img { max-width: 100%; height: auto; display: block; }
 .brand b { font-family: var(--serif-zh); font-weight: 400; font-size: 22px; }
 .nav { display: flex; gap: 28px; font-size: 15px; }
 .nav a { text-decoration: none; color: var(--ink-2); padding: 4px 0; border-bottom: 1px solid transparent; }
-.nav a:hover, .nav a.active { color: var(--ink); border-bottom-color: var(--ink); }
+.nav a:hover, .nav a.active { color: var(--accent); border-bottom-color: var(--accent); }
+::selection { background: var(--marker); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .btn, .card { transition: none; } .btn:hover, .card:hover { transform: none; } }
 .top .where { margin-left: auto; }
 
 /* ---------- 首屏 ---------- */
