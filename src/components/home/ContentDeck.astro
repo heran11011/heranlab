@@ -7,9 +7,6 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 
 <section class="paper-deck" data-paper-deck aria-labelledby="deck-title">
 	<div class="deck-heading"><h2 id="deck-title">桌上随手一张</h2><span class="deck-counter" data-deck-count>01 / {String(items.length).padStart(2, '0')}</span></div>
-	<div class="deck-topics" hidden role="group" aria-label="挑选纸签主题">
-		{topics.map((topic) => <button type="button" data-deck-topic={topic} aria-pressed={topic === '全部' ? 'true' : 'false'} aria-controls="desk-papers">{topic}</button>)}
-	</div>
 	<div class="desk-papers" id="desk-papers">
 		<div class="paper-stage" data-paper-stage>
 			{items.map((item, index) => <article class="desk-paper" data-desk-paper data-topic={homeTopic(item)} hidden={index !== 0}>
@@ -22,7 +19,16 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 			</article>)}
 		</div>
 	</div>
-	<div class="deck-bottom"><p data-deck-status role="status">从我的内容里，随手翻一张。</p><button type="button" class="deck-turn" data-deck-turn hidden>再翻一张 <span aria-hidden="true">↻</span></button></div>
+	<div class="deck-bottom">
+		<p class="sr-only" data-deck-status role="status">从我的内容里，随手翻一张。</p>
+		<details class="deck-topic-menu" data-deck-topic-menu hidden>
+			<summary>挑个主题 <span aria-hidden="true">⌄</span></summary>
+			<div class="deck-topics" hidden role="group" aria-label="挑选纸签主题">
+				{topics.map((topic) => <button type="button" data-deck-topic={topic} aria-pressed={topic === '全部' ? 'true' : 'false'} aria-controls="desk-papers">{topic}</button>)}
+			</div>
+		</details>
+		<button type="button" class="deck-turn" data-deck-turn hidden>再翻一张 <span aria-hidden="true">↻</span></button>
+	</div>
 </section>
 
 <script>
@@ -33,6 +39,7 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 		const counter = deck.querySelector<HTMLElement>('[data-deck-count]');
 		const status = deck.querySelector<HTMLElement>('[data-deck-status]');
 		const topics = deck.querySelector<HTMLElement>('.deck-topics');
+		const topicMenu = deck.querySelector<HTMLDetailsElement>('[data-deck-topic-menu]');
 		const stage = deck.querySelector<HTMLElement>('[data-paper-stage]');
 		if (!turn || !counter || !status || !topics || !stage || !papers.length) return;
 		type Destination = { pool: HTMLElement[]; index: number; topic: string };
@@ -126,6 +133,10 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 		buttons.forEach((button) => button.addEventListener('click', () => {
 			const topic = button.dataset.deckTopic || '全部';
 			request({ pool: topic === '全部' ? papers : papers.filter((paper) => paper.dataset.topic === topic), index: 0, topic });
+			if (topicMenu) {
+				topicMenu.open = false;
+				topicMenu.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+			}
 		}));
 		turn.addEventListener('click', () => request({ ...requested, index: (requested.index + 1) % requested.pool.length }));
 		reducedMotion.addEventListener('change', () => {
@@ -133,16 +144,31 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 		});
 		papers.forEach((paper) => { paper.inert = paper.hidden; });
 		topics.hidden = false;
+		if (topicMenu) {
+			topicMenu.hidden = false;
+			document.addEventListener('pointerdown', (event) => {
+				if (event.target instanceof Node && !topicMenu.contains(event.target)) topicMenu.open = false;
+			});
+			topicMenu.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape') {
+					topicMenu.open = false;
+					topicMenu.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+				}
+			});
+		}
 		turn.hidden = false;
 	});
 </script>
 
 <style>
 	.paper-deck { min-width: 0; max-width: 440px; width: 100%; justify-self: end; }
-	.deck-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 7px 14px; }
-	.deck-heading h2 { font: 400 18px var(--serif-zh); margin: 0; color: var(--ink); }
-	.deck-counter { font: 13px var(--mono); color: var(--accent); }
-	.deck-topics { display: flex; flex-wrap: wrap; gap: 2px; padding-bottom: 14px; }
+	.deck-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 7px 14px; min-height: 44px; }
+	.deck-heading h2 { font: 400 16px var(--serif-zh); margin: 0; color: var(--ink-2); }
+	.deck-counter { font: 11px var(--mono); color: var(--ink-2); white-space: nowrap; }
+	.deck-topic-menu { position: relative; z-index: 4; }
+	.deck-topic-menu summary { display: flex; align-items: center; gap: 7px; min-height: 44px; min-width: 44px; padding-inline: 7px; font: 12px var(--sans); color: var(--ink-2); cursor: pointer; list-style: none; }
+	.deck-topic-menu summary::-webkit-details-marker { display: none; }
+	.deck-topics { position: absolute; bottom: calc(100% + 7px); left: 0; display: flex; flex-wrap: wrap; gap: 2px; width: 240px; padding: 7px; background: var(--paper-2); border: 1px solid var(--rule); box-shadow: var(--shadow-paper); }
 	.deck-topics button { border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--ink-2); font: 11px var(--sans); min-height: 44px; padding: 0 12px; cursor: pointer; border-radius: 0; }
 	.deck-topics button[aria-pressed='true'] { color: var(--accent); border-bottom-color: var(--accent); }
 	/* 同格堆叠：隐藏纸签仍参与尺寸计算，翻页和切换主题不会改变整叠高度。 */
@@ -157,7 +183,7 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 	.is-turning { z-index: 3; pointer-events: none; will-change: transform; }
 	.is-arriving { z-index: 2; will-change: transform; }
 	.desk-paper[hidden] { display: grid; visibility: hidden; pointer-events: none; }
-	.deck-topics[hidden], .deck-turn[hidden] { display: none; }
+	.deck-topics[hidden], .deck-topic-menu[hidden], .deck-turn[hidden] { display: none; }
 	.paper-source { color: var(--accent); font: 11px/1.6 var(--mono); margin: 0 0 16px; }
 	.paper-source span { color: var(--ink-2); }
 	h3 { margin: 0; font: 400 clamp(22px, 1.8vw, 26px)/1.45 var(--serif-zh); text-wrap: pretty; overflow-wrap: anywhere; }
@@ -165,14 +191,14 @@ const topics = ['全部', 'AI 使用', '自己做的', '日常'];
 	.desk-paper a { display: inline-flex; align-items: center; align-self: flex-start; justify-content: space-between; gap: 20px; min-height: 44px; margin-top: auto; font-size: 12px; color: var(--accent); text-decoration: none; }
 	.desk-paper a:hover { text-decoration: underline; text-underline-offset: 5px; }
 	.deck-bottom { display: flex; gap: 12px; align-items: center; justify-content: space-between; min-height: 44px; margin-top: 18px; }
-	.deck-bottom p { flex: 1; min-width: 0; font-size: 11px; line-height: 1.6; color: var(--ink-2); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-	.deck-turn { flex: none; display: flex; align-items: center; gap: 14px; min-height: 44px; padding: 0 14px; border: 1px solid var(--accent); border-radius: 2px; background: var(--paper-2); color: var(--accent); font: 12px var(--sans); cursor: pointer; transition: background var(--motion-fast) var(--decel); }
+	.deck-bottom:has(.deck-turn[hidden]) { display: none; }
+	.deck-turn { flex: none; display: flex; align-items: center; gap: 14px; min-height: 44px; padding: 0 14px; border: 1px solid var(--rule); border-radius: 2px; background: transparent; color: var(--accent); font: 12px var(--sans); cursor: pointer; transition: background var(--motion-fast) var(--decel); }
 	.deck-turn:hover { background: var(--paper-3); }
 	.deck-turn span { display: inline-block; font-size: 18px; transition: transform 450ms var(--spring); }
 	.deck-turn:hover span { transform: rotate(180deg); }
-	:is(a, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+	:is(a, button, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 	.deck-turn[aria-busy='true'] span { transform: rotate(360deg); transition-duration: var(--motion-paper); }
 	@media (hover: hover) and (pointer: fine) { .paper-deck:not([data-turning]) .desk-paper:hover .paper-front { border-color: color-mix(in srgb, var(--accent) 45%, var(--rule)); } }
-	@media (max-width: 700px) { .paper-deck { max-width: none; } .paper-front { padding: 20px 22px 16px; min-height: 205px; } .deck-heading { padding-bottom: 6px; } .deck-topics { padding-bottom: 10px; } .deck-bottom { margin-top: 12px; } }
+	@media (max-width: 700px) { .paper-deck { max-width: none; } .paper-front { padding: 20px 22px 16px; min-height: 205px; } .deck-heading { gap: 7px; } .deck-heading h2 { font-size: 14px; } .deck-counter { font-size: 10px; } .deck-bottom { margin-top: 12px; } }
 	@media (prefers-reduced-motion: reduce) { .deck-turn span { transition: none; } .deck-turn:hover span, .deck-turn[aria-busy='true'] span { transform: none; } }
 </style>

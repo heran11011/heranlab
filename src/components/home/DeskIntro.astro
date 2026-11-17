@@ -1,72 +1,40 @@
 ---
 import { profile } from '../../data/profile';
-import { library, platformLabels } from '../../data/library';
-import { homeCover } from '../../lib/home';
 import ContentDeck from './ContentDeck.astro';
-const pickIds = ['dawdex-adventurex', 'wechat-gr3-companion'];
-const clippings = pickIds.flatMap((id) => {
-	const item = library.find((entry) => entry.id === id);
-	const cover = item && homeCover(item);
-	return item && cover ? [{ item, cover }] : [];
-});
 ---
 <header class="desk-intro" id="hello">
 	<div class="desk-owner">
-		<a class="owner-label" href="/about/"><img src="/social/avatar-soft-square.png" alt="禾冉的头像" width="48" height="48" decoding="async" /><span>禾冉的个人剪报册 <small>NOTES · THINGS · A LITTLE PLAY</small></span></a>
+		<a class="owner-label" href="/about/"><img src="/social/avatar-soft-square.png" alt="禾冉的头像" width="40" height="40" decoding="async" /><span>禾冉的个人网站</span></a>
 		<h1>{profile.nameEn}<span>.</span></h1>
-		<p class="desk-lead">写下来的，<br />和做出来的。</p>
-		<p class="desk-description">我是禾冉。这里放 AI 使用笔记、日常观察，<br class="desktop-break" />还有自己做的小工具和视频。</p>
-		<div class="desk-bottom-row">
-			<a class="desk-start" href="#writing">从图文开始 <span aria-hidden="true">↓</span></a>
-			<div class="desk-clippings" aria-label="从这两篇开始逛">
-				{clippings.map(({item, cover}, index) => <a class="desk-clipping" href={`/content/${item.id}/`} aria-label={`翻开：${item.title}`} style={`--clip-angle:${index === 0 ? '-6deg' : '5deg'}`}>
-					<img src={cover.src} width={cover.width} height={cover.height} alt="" decoding="async" loading="eager" />
-					<span>{platformLabels[item.platform]} <i aria-hidden="true">↗</i></span>
-				</a>)}
-			</div>
-		</div>
+		<p class="desk-lead">写下来的，和做出来的。</p>
+		<p class="desk-description">AI 使用笔记、日常观察，<br />还有自己做的小工具和视频。</p>
+		<a class="desk-start" href="#writing">往下逛逛 <span aria-hidden="true">↓</span></a>
 	</div>
 	<div class="desk-play" data-desk-play><ContentDeck /></div>
-	<div class="desk-colophon" aria-hidden="true"><span>PERSONAL JOURNAL / HERAN</span><span>图文、视频，和小工具</span></div>
 </header>
 <style>
-	.desk-intro { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: 28px clamp(28px, 5vw, 70px); padding: 42px 7px 0; }
+	.desk-intro { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: clamp(28px, 5vw, 70px); padding: 56px 7px; }
 	.desk-owner { min-width: 0; }
-	.desk-play { min-width: 0; width: 100%; max-width: 406px; justify-self: end; padding-top: 7px; }
-	.owner-label { display: inline-flex; align-items: center; gap: 14px; text-decoration: none; color: var(--ink-2); font-size: 12px; }
-	.owner-label img { width: 48px; height: 48px; border-radius: var(--avatar-radius); }
-	.owner-label small { display: block; font: 9px/1.7 var(--mono); letter-spacing: .09em; margin-top: 3px; }
-	h1 { font: 400 clamp(108px, 11.5vw, 164px)/.86 var(--serif-en); margin: 28px 0 21px; letter-spacing: -.045em; }
+	.desk-play { min-width: 0; width: 100%; max-width: 406px; justify-self: end; }
+	.owner-label { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; text-decoration: none; color: var(--ink-2); font-size: 12px; }
+	.owner-label img { width: 40px; height: 40px; border-radius: var(--avatar-radius); }
+	h1 { font: 400 clamp(96px, 8.5vw, 128px)/.9 var(--serif-en); margin: 28px 0 21px; letter-spacing: -.035em; }
 	h1 span { color: var(--accent); }
-	.desk-lead { font: 400 clamp(27px, 3vw, 39px)/1.42 var(--serif-zh); margin: 0 0 14px; letter-spacing: -.025em; }
-	.desk-lead br { display: none; }
-	.desk-description { font-size: 13px; line-height: 1.9; color: var(--ink-2); margin: 0; }
-	.desk-bottom-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 28px; }
-	.desk-start { display: inline-flex; flex: none; gap: 28px; align-items: center; min-height: 44px; color: var(--accent); text-decoration: none; font-size: 12px; }
-	.desk-start span { font-size: 20px; transition: transform var(--motion-ui) var(--decel); }
-	.desk-start:hover span { transform: translateY(4px); }
-	.desk-clippings { display: flex; gap: 10px; padding-right: 7px; }
-	.desk-clipping { display: block; width: 94px; padding: 5px 5px 0; background: var(--paper-2); border: 1px solid var(--rule); box-shadow: var(--shadow-paper); text-decoration: none; transform: rotate(var(--clip-angle)); transition: transform var(--motion-ui) var(--decel); }
-	.desk-clipping img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
-	.desk-clipping span { display: flex; justify-content: space-between; align-items: center; padding: 4px 2px; font: 9px/1.4 var(--mono); color: var(--ink-2); }
-	.desk-clipping i { color: var(--accent); font-size: 12px; font-style: normal; }
-	:global([data-scrapbook='aligned']) .desk-clipping { transform: none; box-shadow: none; }
-	.desk-colophon { grid-column: 1/-1; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 21px 0 14px; border-top: 1px solid var(--rule); font: 9px/1.5 var(--mono); letter-spacing: .07em; color: var(--ink-3); }
+	.desk-lead { font: 400 clamp(25px, 2.5vw, 32px)/1.5 var(--serif-zh); margin: 0 0 14px; letter-spacing: -.025em; text-wrap: pretty; }
+	.desk-description { font-size: 14px; line-height: 1.85; color: var(--ink-2); margin: 0; }
+	.desk-start { display: inline-flex; gap: 14px; align-items: center; min-height: 44px; margin-top: 21px; color: var(--ink-2); text-decoration: none; font-size: 12px; }
+	.desk-start span { transition: transform var(--motion-ui) var(--decel); }
+	.desk-start:hover { color: var(--accent); }
+	.desk-start:hover span { transform: translateY(3px); }
 	a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
-	@media (hover: hover) and (pointer: fine) { .desk-clipping:hover { transform: translateY(-5px) rotate(0deg); } }
-	@media (max-width: 1000px) { .desk-intro { gap: 28px; } .desk-bottom-row { margin-top: 21px; } .desk-clipping { width: 82px; } .desk-start { gap: 14px; } }
+	@media (max-width: 1000px) { .desk-intro { gap: 28px; } }
 	@media (max-width: 700px) {
-		.desk-intro { grid-template-columns: minmax(0, 1fr); gap: 21px; padding: 21px 0 0; }
-		h1 { font-size: clamp(100px, 23vw, 144px); margin: 14px 0 7px; }
-		.desk-lead { font-size: clamp(25px, 6vw, 34px); margin-bottom: 7px; }
-		.desk-description { font-size: 12px; line-height: 1.75; }
-		.desk-bottom-row { margin-top: 14px; }
-		.desk-play { max-width: none; padding: 0 7px; }
-		.desk-clipping { width: 64px; }
-		.desk-colophon { margin-top: 7px; padding-top: 14px; font-size: 8px; letter-spacing: .02em; }
-		.owner-label img { width: 42px; height: 42px; }
+		.desk-intro { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 28px 0 42px; }
+		h1 { font-size: clamp(76px, 22vw, 100px); margin: 14px 0; }
+		.desk-lead { font-size: clamp(22px, 5.6vw, 28px); margin-bottom: 7px; }
+		.desk-description { font-size: 13px; line-height: 1.8; }
+		.desk-start { margin-top: 7px; }
+		.desk-play { max-width: none; padding-inline: 7px; }
 	}
-	@media (max-width: 360px) { .desktop-break { display: none; } .desk-clipping { width: 64px; } .desk-clippings { gap: 7px; } }
-	@media (prefers-reduced-motion: no-preference) { h1 { animation: ink-arrives 500ms var(--decel); } @keyframes ink-arrives { from { opacity: .65; transform: translateY(8px); } to { opacity: 1; transform: none; } } }
-	@media (prefers-reduced-motion: reduce) { .desk-start span, .desk-clipping { transition: none; } .desk-start:hover span { transform: none; } .desk-clipping:hover { transform: rotate(var(--clip-angle)); } }
+	@media (prefers-reduced-motion: reduce) { .desk-start span { transition: none; } .desk-start:hover span { transform: none; } }
 </style>

@@ -36,7 +36,10 @@ for (const tone of ['paper', 'forest', 'night']) {
 	}
 }
 
-assert.ok(home.includes('data-scrapbook="scattered"'), 'Default scrapbook layout missing');
+assert.ok(home.includes('data-scrapbook="aligned"'), 'Default homepage must use calm, aligned covers');
+assert.ok(!home.includes('desk-clippings') && !home.includes('desk-colophon'), 'Redundant hero decorations must stay removed');
+assert.match(home, /<details\b(?=[^>]*\bdata-deck-topic-menu\b)(?![^>]*\bopen\b)[^>]*>/, 'Low-frequency paper filters should start closed, not hide the paper itself');
+assert.match(home, /<details\b(?=[^>]*class="reading-order")(?![^>]*\bopen\b)[^>]*>/, 'Cover layout settings should start closed');
 for (const order of ['scattered', 'aligned']) assert.ok(home.includes(`data-scrapbook-order="${order}"`), `Layout toggle missing: ${order}`);
 assert.match(home, /<div\b(?=[^>]*class="reading-tools")(?=[^>]*\bhidden\b)[^>]*>/, 'No-JS layout controls must remain hidden');
 for (const view of ['illustrated', 'catalog']) assert.ok(catalog.includes(`data-view="${view}"`), `Catalog view missing: ${view}`);

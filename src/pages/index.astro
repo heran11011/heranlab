@@ -26,24 +26,27 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 ---
 
 <Base description={description}>
-	<div class="home-page" data-scrapbook="scattered">
+	<div class="home-page" data-scrapbook="aligned">
 		<DeskIntro />
 		<ChapterTabs />
 
 		<section class="reading-room" id="writing" aria-labelledby="reading-title" data-home-reading>
 			<header class="reading-heading">
-				<div><p class="section-kicker">SELECTED PAGES / 选读</p><h2 id="reading-title"><span class="chapter-number" aria-hidden="true">01</span> 图文随记</h2></div>
+				<div><h2 id="reading-title"><span class="chapter-number" aria-hidden="true">01</span> 图文随记</h2></div>
 				<a href="/content/">翻整本剪报册 <span class="content-total">{library.length}</span> <span aria-hidden="true">↗</span></a>
 			</header>
 			<div class="reading-tools" hidden>
 				<div class="topic-buttons" role="group" aria-label="筛选图文与短句主题">
 					{homeTopics.map((topic) => <button type="button" data-home-topic={topic} aria-pressed={topic === '全部' ? 'true' : 'false'} aria-controls="home-reading-grid">{topic}</button>)}
 				</div>
-				<div class="reading-order" role="group" aria-label="整理这页封面的摆放方式"><span>这页怎么放</span><button type="button" data-scrapbook-order="scattered" aria-pressed="true">散着贴</button><button type="button" data-scrapbook-order="aligned" aria-pressed="false">排整齐</button></div>
+				<details class="reading-order">
+					<summary>版面 <span aria-hidden="true">⌄</span></summary>
+					<div role="group" aria-label="封面摆放方式"><button type="button" data-scrapbook-order="aligned" aria-pressed="true">排整齐</button><button type="button" data-scrapbook-order="scattered" aria-pressed="false">散着贴</button></div>
+				</details>
 			</div>
 			<p class="reading-count" aria-live="polite" aria-atomic="true">选读 {reading.length} 篇图文与短句</p>
 			<div class="reading-grid" id="home-reading-grid">
-				{reading.map((item, index) => <HomeEntry item={item} variant={variants[index]} number={index + 1} />)}
+				{reading.map((item, index) => <HomeEntry item={item} variant={variants[index]} />)}
 			</div>
 			<noscript><p class="no-script-note">图文与短句已全部展开，视频在下面的放映架。</p></noscript>
 		</section>
@@ -81,16 +84,31 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 		const entries = Array.from(room.querySelectorAll<HTMLElement>('[data-home-entry]'));
 		const page = room.closest<HTMLElement>('.home-page');
 		const orders = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-scrapbook-order]'));
+		const orderMenu = room.querySelector<HTMLDetailsElement>('.reading-order');
 		if (!tools || !grid || !count || !page) return;
 		const arrange = (order: string) => {
-			page.dataset.scrapbook = order === 'aligned' ? 'aligned' : 'scattered';
+			page.dataset.scrapbook = order === 'scattered' ? 'scattered' : 'aligned';
 			orders.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.scrapbookOrder === page.dataset.scrapbook)));
 		};
-		try { arrange(localStorage.getItem('heran-scrapbook-order') || 'scattered'); } catch {}
+		// 新版默认端正；旧版曾自动写入的“散贴”状态不带入本轮。
+		try { arrange(localStorage.getItem('heran-scrapbook-order-v2') || 'aligned'); } catch {}
 		orders.forEach((button) => button.addEventListener('click', () => {
 			arrange(button.dataset.scrapbookOrder || 'scattered');
-			try { localStorage.setItem('heran-scrapbook-order', page.dataset.scrapbook!); } catch {}
+			try { localStorage.setItem('heran-scrapbook-order-v2', page.dataset.scrapbook!); } catch {}
+			if (orderMenu) {
+				orderMenu.open = false;
+				orderMenu.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+			}
 		}));
+		document.addEventListener('pointerdown', (event) => {
+			if (orderMenu && event.target instanceof Node && !orderMenu.contains(event.target)) orderMenu.open = false;
+		});
+		orderMenu?.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				orderMenu.open = false;
+				orderMenu.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+			}
+		});
 		buttons.forEach((button) => button.addEventListener('click', () => {
 			const topic = button.dataset.homeTopic;
 			buttons.forEach((entry) => entry.setAttribute('aria-pressed', String(entry === button)));
@@ -105,11 +123,13 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 <style>
 	.home-page { padding-bottom: 28px; --home-ease: var(--decel); }
 	.home-page :is(section[id]) { scroll-margin-top: 126px; }
-	.chapter-number { display: inline-block; margin-right: 14px; font: 400 48px/.8 var(--serif-en); color: var(--accent); }
+	.chapter-number { display: inline-block; margin-right: 14px; font: 400 24px/1 var(--serif-en); color: var(--ink-3); }
 	.reading-room { padding-top: 28px; }
-	.content-total { margin-inline: 7px; color: var(--accent); font: 18px var(--serif-en); }
-	.reading-order { display: flex; align-items: center; gap: 2px; flex: none; }
-	.reading-order > span { color: var(--ink-3); font: 10px var(--mono); margin-right: 7px; }
+	.content-total { margin-inline: 7px; color: var(--ink-2); font: 14px var(--mono); }
+	.reading-order { position: relative; z-index: 2; flex: none; }
+	.reading-order summary { display: flex; align-items: center; gap: 7px; min-height: 44px; min-width: 44px; color: var(--ink-2); font: 12px var(--sans); cursor: pointer; list-style: none; }
+	.reading-order summary::-webkit-details-marker { display: none; }
+	.reading-order > div { position: absolute; top: 100%; right: 0; display: flex; width: 170px; padding: 7px; background: var(--paper-2); border: 1px solid var(--rule); box-shadow: var(--shadow-paper); }
 	.reading-order button { min-height: 44px; padding: 0 10px; cursor: pointer; border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--ink-2); font: 11px var(--sans); }
 	.reading-order button[aria-pressed='true'] { color: var(--accent); border-bottom-color: var(--accent); }
 	.reading-order button:hover { color: var(--ink); }
@@ -117,13 +137,14 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 	h2 { font: 400 30px/1.3 var(--serif-zh); margin: 0; }
 	.reading-heading h2 { font-size: 28px; }
 	.reading-heading > a, .section-heading > a { font-size: 12px; color: var(--ink-2); text-decoration: none; }
-	.reading-tools { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 21px 0 7px; border-bottom: 1px solid var(--rule); padding-bottom: 7px; }
+	.reading-tools { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 7px 14px; margin: 14px 0 21px; }
 	.reading-tools[hidden] { display: none; }
 	.topic-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-	.topic-buttons button { font: 12px var(--sans); cursor: pointer; min-height: 44px; padding: 0 14px; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--ink-2); transition: background var(--motion-fast) var(--home-ease), color var(--motion-fast) var(--home-ease); }
-	.topic-buttons button[aria-pressed='true'] { color: var(--accent); background: var(--paper-3); }
+	.topic-buttons button { font: 12px var(--sans); cursor: pointer; min-height: 44px; padding: 0 14px; border: 0; border-bottom: 1px solid transparent; border-radius: 0; background: transparent; color: var(--ink-2); transition: background var(--motion-fast) var(--home-ease), color var(--motion-fast) var(--home-ease); }
+	.topic-buttons button[aria-pressed='true'] { color: var(--accent); border-bottom-color: var(--accent); }
 	.topic-buttons button:hover:not([aria-pressed='true']) { background: var(--paper-3); color: var(--ink); }
-	.reading-count { font: 10px/1.6 var(--mono); margin: 0 0 28px; padding-top: 7px; color: var(--ink-3); }
+	/* 数量继续向辅助技术播报，画面上不再增加一层重复说明。 */
+	.reading-count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
 	.reading-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 28px 56px; margin-top: 14px; align-items: start; }
 	.reading-grid[data-filtered='true'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	.reading-grid[data-filtered='true'] > :global(.entry) { grid-column: auto; grid-row: auto; }
@@ -149,22 +170,21 @@ const description = 'AI 使用笔记、日常观察，和自己做的东西';
 	.contact-line > span { width: 100%; font-size: 12px; color: var(--ink-2); }
 	.contact-line > a { display: inline-flex; align-items: center; min-height: 44px; font: 14px/1.8 var(--mono); color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
 	.contact-line .copy { min-height: 44px; min-width: 44px; }
-	.home-page a:focus-visible, .home-page button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+	.home-page a:focus-visible, .home-page button:focus-visible, .home-page summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 	.reading-heading a:hover, .section-heading a:hover, .closing-note a:hover, .contact-line a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
 	@media (max-width: 1000px) {
 		.reading-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; }
 		.last-page { gap: 32px; }
 	}
 	@media (max-width: 700px) {
-		.reading-tools { display: flex; align-items: flex-start; flex-direction: column; gap: 0; }
-		.reading-order { align-self: flex-end; }
+		.reading-tools { gap: 7px; }
+		.reading-order { margin-left: auto; }
 		.reading-heading { align-items: flex-end; }
 		.reading-heading > a { max-width: 105px; text-align: right; line-height: 1.8; }
 		.reading-heading h2 { font-size: 26px; }
-		.chapter-number { font-size: 38px; margin-right: 7px; }
+		.chapter-number { font-size: 22px; margin-right: 7px; }
 		.topic-buttons { gap: 3px; }
-		.topic-buttons button { padding: 0 12px; }
-		.reading-count { margin-top: 10px; }
+		.topic-buttons button { padding: 0 8px; }
 		.reading-grid, .reading-grid[data-filtered='true'] { grid-template-columns: minmax(0, 1fr); gap: 24px; }
 		.reading-grid[data-filtered='true'] > :global(.entry--lead) { grid-column: auto; }
 		.project-paths, .last-page { grid-template-columns: minmax(0, 1fr); gap: 18px; }
