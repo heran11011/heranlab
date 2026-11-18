@@ -37,8 +37,10 @@ for (const tone of ['paper', 'forest', 'night']) {
 	}
 }
 
-// stage 的负外边距仅用于动画空间，不能折叠到 stack 并撑大两张底纸。
-assert.match(portal, /\.portal-stack\s*\{[^}]*\bdisplay:\s*flow-root\b/, 'Paper stack must contain stage margins; verify its paper-sized bounds in browser too');
+// 底纸保持独立尺寸，动画纸不能再被带负外边距的窗口裁掉。
+assert.match(portal, /\.portal-stack\s*\{[^}]*\bdisplay:\s*flow-root\b/, 'Paper stack needs an independent layout context');
+assert.match(portal, /\.portal-stage\s*\{[^}]*\boverflow:\s*visible\b/, 'Lifted papers must not be clipped by their animation stage');
+assert.ok(!/\.portal-stage\s*\{[^}]*(?:padding|margin):/.test(portal), 'Animation-space padding and negative margins must not enlarge the backing papers');
 assert.ok(home.includes('data-home-portal'), 'Homepage must stay a simple introduction and interactive portal');
 for (const obsolete of ['desk-clippings', 'desk-colophon', 'data-scrapbook', 'data-home-reading']) assert.ok(!home.includes(obsolete), `Removed homepage clutter returned: ${obsolete}`);
 assert.equal((home.match(/role="tab"/g) || []).length, 4, 'Four destination bookmarks missing');
