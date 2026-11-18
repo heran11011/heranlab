@@ -36,16 +36,16 @@ for (const tone of ['paper', 'forest', 'night']) {
 	}
 }
 
-assert.ok(home.includes('data-scrapbook="aligned"'), 'Default homepage must use calm, aligned covers');
-assert.ok(!home.includes('desk-clippings') && !home.includes('desk-colophon'), 'Redundant hero decorations must stay removed');
-assert.match(home, /<details\b(?=[^>]*\bdata-deck-topic-menu\b)(?![^>]*\bopen\b)[^>]*>/, 'Low-frequency paper filters should start closed, not hide the paper itself');
-assert.match(home, /<details\b(?=[^>]*class="reading-order")(?![^>]*\bopen\b)[^>]*>/, 'Cover layout settings should start closed');
-for (const order of ['scattered', 'aligned']) assert.ok(home.includes(`data-scrapbook-order="${order}"`), `Layout toggle missing: ${order}`);
-assert.match(home, /<div\b(?=[^>]*class="reading-tools")(?=[^>]*\bhidden\b)[^>]*>/, 'No-JS layout controls must remain hidden');
+assert.ok(home.includes('data-home-portal'), 'Homepage must stay a simple introduction and interactive portal');
+for (const obsolete of ['desk-clippings', 'desk-colophon', 'data-scrapbook', 'data-home-reading']) assert.ok(!home.includes(obsolete), `Removed homepage clutter returned: ${obsolete}`);
+assert.equal((home.match(/role="tab"/g) || []).length, 4, 'Four destination bookmarks missing');
+for (const control of ['data-portal-tabs', 'data-portal-controls']) assert.match(home, new RegExp(`<div\\b(?=[^>]*\\b${control}\\b)(?=[^>]*\\bhidden\\b)[^>]*>`), 'No-JS switching controls must remain hidden');
+assert.ok(home.includes('data-portal-prev') && home.includes('data-portal-next'), 'Explicit paper controls missing');
+assert.ok(home.includes('data-portal-status') && home.includes('aria-live="polite"'), 'Paper switching announcement missing');
 for (const view of ['illustrated', 'catalog']) assert.ok(catalog.includes(`data-view="${view}"`), `Catalog view missing: ${view}`);
 assert.match(catalog, /<div\b(?=[^>]*\bdata-library-controls\b)(?=[^>]*\bhidden\b)[^>]*>/, 'No-JS search controls must remain hidden');
 assert.ok(catalog.includes('data-library-reset'), 'Empty-state reset missing');
 // 只验证域名护栏与静态 HTML；是否真的不联网仍由浏览器核验。
 assert.match(head, /if \(!\['heranlab\.com', 'www\.heranlab\.com'\]\.includes\(location\.hostname\)\) return;/, 'Preview analytics hostname guard missing');
 assert.ok(!/<script\b[^>]*src="https:\/\/www\.googletagmanager\.com/i.test(home), 'Preview HTML must not eagerly load analytics');
-console.log(`PASS: ${pairs} text/paper contrast pairs (minimum ${minimum.toFixed(3)}:1), scrapbook/catalog controls, no-JS controls and preview analytics guard. Browser interaction checks are separate.`);
+console.log(`PASS: ${pairs} text/paper contrast pairs (minimum ${minimum.toFixed(3)}:1), paper portal/catalog controls, no-JS controls and preview analytics guard. Browser interaction checks are separate.`);

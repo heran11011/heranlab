@@ -138,18 +138,17 @@ assert.ok(globalCSS.includes('--avatar-radius: 16.6667%'), 'Avatar rounding must
 const homeHTML = await readFile(path.join(root, 'dist/index.html'), 'utf8');
 const home = homeHTML.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
 assert.ok(home, 'Homepage main missing');
-assert.ok(home.includes('data-paper-deck') && home.includes('data-chapter-tabs'), 'Personal desk interactions missing');
-// 核心纸签直接展示，不能在手机上退回到需要点开的折叠入口。
-assert.match(home, /<div\b(?=[^>]*\bdata-desk-play\b)(?![^>]*\bhidden\b)[^>]*>/, 'Paper deck must have a visible, non-collapsible wrapper');
-assert.ok(!/<details\b[^>]*\bdata-desk-play\b/.test(home), 'Paper deck must not be behind a disclosure');
-assert.ok(!home.includes('桌上有一叠纸签') && !home.includes('点开翻翻'), 'Obsolete paper-deck disclosure prompt');
-const firstPaperTag = home.match(/<article\b[^>]*\bdata-desk-paper\b[^>]*>/)?.[0];
-assert.ok(firstPaperTag && !/\bhidden\b/.test(firstPaperTag), 'First paper must be visible without JavaScript');
-for (const id of ids) assert.ok(home.includes(`/content/${id}/`), `Desk paper missing: ${id}`);
-assert.ok(home.includes('/content/dawdex-adventurex/'), 'Lead content missing on homepage');
-assert.ok(home.includes('/content/dawdex-video/'), 'Video content missing on homepage');
-assert.ok(home.includes('/content/early-video-regret/'), 'Second video missing on homepage');
-assert.ok((home.match(/<img\b/g) || []).length >= 5, 'Homepage has lost its image-led layout');
+// 2026-11-18 新职责：首页是交互入口，内容陈列在 /content/，不再要求首页复制所有条目。
+assert.ok(home.includes('data-home-portal') && home.includes('data-portal-desk'), 'Interactive paper portal missing');
+assert.equal((home.match(/<article\b[^>]*\bdata-portal-sheet\b/g) || []).length, 4, 'Homepage needs four destination papers, not an article feed');
+assert.ok(!/<details\b[^>]*\bdata-portal/.test(home), 'Primary paper must not be hidden behind a disclosure');
+const firstPaperTag = home.match(/<article\b[^>]*\bdata-portal-sheet\b[^>]*>/)?.[0];
+assert.ok(firstPaperTag && !/\b(?:hidden|inert)\b/.test(firstPaperTag), 'First destination must be usable without JavaScript');
+for (const href of ['/content/', '/work/', '/about/', '/about/#contact']) assert.ok(home.includes(`href="${href}"`), `Portal destination missing: ${href}`);
+assert.ok(home.includes('<noscript>') && home.includes('portal-fallback'), 'No-JS destination links missing');
+for (const id of ids) assert.ok(!home.includes(`/content/${id}/`), `Article listing leaked back onto homepage: ${id}`);
+assert.ok(!home.includes('data-home-reading') && !home.includes('data-video-shelf'), 'Content shelves must stay on inner pages');
+assert.ok((home.match(/<img\b/g) || []).length <= 1, 'Homepage must remain a simple introduction and paper portal');
 assert.ok(!home.includes('截图待补') && !home.includes('照片待补'), 'Placeholder images must not lead the homepage');
 const checked = await checkGenerated(path.join(root, 'dist'));
-console.log(`PASS: always-visible paper deck, personal desk, original paragraphs, reader tools and image viewer; image-led homepage and video links; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);
+console.log(`PASS: simple four-destination paper portal and no-JS links; all content remains on inner pages with original paragraphs, reader tools and image viewer; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);
