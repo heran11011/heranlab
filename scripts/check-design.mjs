@@ -6,6 +6,7 @@ const css = await read('src/styles/global.css');
 const home = await read('dist/index.html');
 const catalog = await read('dist/content/index.html');
 const head = await read('src/components/BaseHead.astro');
+const portal = await read('src/components/home/PortalDesk.astro');
 
 // 测量语义色的真实对比度，而不是仅要求色值“看起来深一点”。
 const luminance = (hex) => {
@@ -36,6 +37,8 @@ for (const tone of ['paper', 'forest', 'night']) {
 	}
 }
 
+// stage 的负外边距仅用于动画空间，不能折叠到 stack 并撑大两张底纸。
+assert.match(portal, /\.portal-stack\s*\{[^}]*\bdisplay:\s*flow-root\b/, 'Paper stack must contain stage margins; verify its paper-sized bounds in browser too');
 assert.ok(home.includes('data-home-portal'), 'Homepage must stay a simple introduction and interactive portal');
 for (const obsolete of ['desk-clippings', 'desk-colophon', 'data-scrapbook', 'data-home-reading']) assert.ok(!home.includes(obsolete), `Removed homepage clutter returned: ${obsolete}`);
 assert.equal((home.match(/role="tab"/g) || []).length, 4, 'Four destination bookmarks missing');

@@ -221,7 +221,8 @@ const pages = [
 	.portal-tabs { display: flex; align-items: end; gap: 7px; padding: 0 7px 21px; }
 	.portal-tabs button { min-height: 44px; min-width: 44px; padding: 7px 14px; color: var(--ink-2); background: transparent; border: 0; border-bottom: 1px solid transparent; font: 13px var(--sans); cursor: pointer; transition: color var(--motion-fast) var(--decel); }
 	.portal-tabs button[aria-selected='true'] { color: var(--accent); border-bottom-color: var(--accent); }
-	.portal-stack { position: relative; isolation: isolate; }
+	/* 独立布局上下文阻止 stage 的负外边距折叠，底纸只包住纸面而非动画预留区。 */
+	.portal-stack { display: flow-root; position: relative; isolation: isolate; }
 	.portal-stack::before, .portal-stack::after { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--paper-3); border: 1px solid var(--rule); transform: translateY(8px) rotate(-2deg); pointer-events: none; }
 	.portal-stack::after { background: var(--paper-2); transform: translateY(4px) rotate(1.2deg); }
 	.portal-stage { display: grid; position: relative; isolation: isolate; padding: 160px 16px 28px; margin: -160px -16px -28px; overflow: clip; pointer-events: none; }
