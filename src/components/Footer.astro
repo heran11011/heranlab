@@ -8,6 +8,17 @@ const updated = ymd(new Date());
 <footer class="foot">
 	<div class="wrap">
 		<span class="mono">© {new Date().getFullYear()} {profile.name} {profile.nameEn} · <a href={`mailto:${profile.email}`}>{profile.email}</a></span>
-		<span class="mono">最后更新 {updated} · <a href="/rss.xml">RSS</a></span>
+		<div class="foot-end mono"><span>最后更新 {updated}</span><a href="/rss.xml">RSS</a><a class="foot-up" href="#page-top">回页首 <span aria-hidden="true">↑</span></a></div>
 	</div>
 </footer>
+
+<style>
+	.foot-end { display: flex; align-items: center; flex-wrap: wrap; gap: 0 16px; }
+	.foot-end a { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; }
+	.foot-up { color: var(--accent); }
+	.foot-up:hover { text-decoration: underline; text-underline-offset: 4px; }
+	@media (prefers-reduced-motion: no-preference) {
+		.foot-up span { transition: transform var(--motion-ui) var(--decel); }
+		.foot-up:is(:hover, :focus-visible) span { transform: translateY(-3px); }
+	}
+</style>

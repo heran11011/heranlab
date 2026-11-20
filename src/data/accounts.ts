@@ -62,12 +62,7 @@ export const accounts: Account[] = [
 		], verifiedAt: '2026-11-13',
 	},
 	{
-		id: 'github', label: 'GitHub', name: 'huntingrin', handle: '@huntingrin', href: 'https://github.com/huntingrin',
-		description: '公开的 Agent Skill 与工具源码。', avatar: '/social/github-avatar.jpg', itemsLabel: '精选仓库',
-		items: [
-			{ title: 'xhs-opportunity-kit', kind: '小红书机会管理 SDK', href: 'https://github.com/huntingrin/xhs-opportunity-kit' },
-			{ title: 'seedance-anime-prompt-library', kind: '动画视频提示词库', href: 'https://github.com/huntingrin/seedance-anime-prompt-library' },
-			{ title: 'jd-bean-claim', kind: '京东京豆签到 Skill', href: 'https://github.com/huntingrin/jd-bean-claim' },
-		], verifiedAt: '2026-11-13',
+		id: 'github', label: 'GitHub', name: 'heran11011', handle: '@heran11011', href: 'https://github.com/heran11011',
+		description: '我的个人 GitHub 账号。', items: [], verifiedAt: '2026-11-20',
 	},
 ];

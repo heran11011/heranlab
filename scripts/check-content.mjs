@@ -146,9 +146,16 @@ const firstPaperTag = home.match(/<article\b[^>]*\bdata-portal-sheet\b[^>]*>/)?.
 assert.ok(firstPaperTag && !/\b(?:hidden|inert)\b/.test(firstPaperTag), 'First destination must be usable without JavaScript');
 for (const href of ['/content/', '/work/', '/about/', '/about/#contact']) assert.ok(home.includes(`href="${href}"`), `Portal destination missing: ${href}`);
 assert.ok(home.includes('<noscript>') && home.includes('portal-fallback'), 'No-JS destination links missing');
-for (const id of ids) assert.ok(!home.includes(`/content/${id}/`), `Article listing leaked back onto homepage: ${id}`);
+const picks = [...home.matchAll(/<a\b(?=[^>]*\bdata-home-pick\b)[^>]*>[\s\S]*?<\/a>/g)];
+assert.equal(picks.length, 1, 'Allow one selected case, not a homepage feed');
+const pick = picks[0][0];
+const pickId = pick.match(/\bhref="\/content\/([^"/]+)\/"/)?.[1];
+const pickedItem = items.find((item) => item.id === pickId);
+assert.ok(pickedItem?.cover && pick.includes(`src="${pickedItem.cover}"`), 'Homepage pick must reuse a verified entry and its public cover');
+const homeWithoutPick = home.replace(pick, '');
+for (const id of ids) assert.ok(!homeWithoutPick.includes(`/content/${id}/`), `Article listing leaked back onto homepage: ${id}`);
 assert.ok(!home.includes('data-home-reading') && !home.includes('data-video-shelf'), 'Content shelves must stay on inner pages');
-assert.ok((home.match(/<img\b/g) || []).length <= 1, 'Homepage must remain a simple introduction and paper portal');
+assert.ok((homeWithoutPick.match(/<img\b/g) || []).length <= 1, 'No extra gallery images beside the desk pick');
 assert.ok(!home.includes('截图待补') && !home.includes('照片待补'), 'Placeholder images must not lead the homepage');
 const checked = await checkGenerated(path.join(root, 'dist'));
 console.log(`PASS: simple four-destination paper portal and no-JS links; all content remains on inner pages with original paragraphs, reader tools and image viewer; ${items.length} verified entries, ${ids.size} detail pages, old article URLs, consistent rounded-square avatars and favicon; ${checked} generated files scanned for identifying details.`);

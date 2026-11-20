@@ -35,7 +35,7 @@
 			buttons.forEach((button) => button.addEventListener('click', () => {
 				apply(button.dataset.tone || 'paper', true);
 				menu.open = false;
-				summary.focus();
+				summary.focus({ preventScroll: true });
 			}, { signal }));
 			this.addEventListener('keydown', (event) => {
 				if (event.key === 'Escape' && menu.open) { menu.open = false; summary.focus(); }
@@ -61,6 +61,8 @@
 	.tone-picker summary { display: flex; align-items: center; gap: 7px; min-height: 44px; min-width: 44px; cursor: pointer; list-style: none; color: var(--ink-2); }
 	.tone-picker summary::-webkit-details-marker { display: none; }
 	.tone-swatch { width: 15px; height: 15px; border: 1px solid var(--ink-2); border-radius: 50%; background: var(--paper-3); }
+	:global(html[data-tone='forest']) .tone-swatch { background: linear-gradient(135deg, var(--paper-3) 49%, var(--accent) 51%); }
+	:global(html[data-tone='night']) .tone-swatch { background: linear-gradient(135deg, var(--paper-3) 49%, var(--accent) 51%); }
 	.tone-picker summary:focus-visible, .tone-panel button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 	.tone-panel { position: absolute; right: 0; top: calc(100% + 9px); width: 160px; padding: 14px; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper-2); box-shadow: 0 12px 30px #00000012; }
 	.tone-panel p { font-size: 11px; margin: 0 0 8px; color: var(--ink-2); }
@@ -68,5 +70,11 @@
 	.tone-panel button[aria-pressed='true'] { background: var(--paper-3); }
 	.tone-panel button:hover { background: var(--paper-3); }
 	.tone-panel i { display: block; width: 17px; height: 17px; border-radius: 50%; border: 1px solid #00000020; }
+	@media (prefers-reduced-motion: no-preference) {
+		.tone-picker[open] .tone-panel { animation: tone-unfold 200ms var(--decel) both; }
+		.tone-swatch { transition: transform var(--motion-ui) var(--decel); }
+		.tone-picker[open] .tone-swatch { transform: rotate(-28deg); }
+	}
+	@keyframes tone-unfold { from { opacity: 0; translate: 0 -5px; } to { opacity: 1; translate: 0 0; } }
 	.paper { background: #f5f2e9; } .forest { background: #d8e3ce; } .night { background: #1c211d; }
 </style>

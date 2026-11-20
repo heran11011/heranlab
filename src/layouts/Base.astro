@@ -32,22 +32,37 @@ const fullTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 		<Footer />
 		<ReadingTools />
 		<script>
-			// 复制按钮：data-copy 优先，否则复制前一个元素的文字
+			// 状态由独立播报区反馈；连点不会把“已复制”当成默认文案。
+			const announcement = document.createElement('span');
+			announcement.className = 'sr-only';
+			announcement.setAttribute('role', 'status');
+			announcement.setAttribute('aria-atomic', 'true');
+			document.body.append(announcement);
 			document.querySelectorAll<HTMLButtonElement>('button.copy').forEach((b) => {
-				b.addEventListener('click', async (e) => {
-					e.preventDefault();
-					const text = b.dataset.copy || b.previousElementSibling?.textContent || '';
-					try {
-						await navigator.clipboard.writeText(text.trim());
-					} catch {
-						const old = b.textContent;
-						b.textContent = '请手动复制';
-						setTimeout(() => (b.textContent = old), 1400);
-						return;
+				const label = b.textContent;
+				let timeout: ReturnType<typeof setTimeout>;
+				let request = 0;
+				b.dataset.copyReady = '';
+				b.addEventListener('click', async () => {
+					const id = ++request;
+					const source = b.previousElementSibling;
+					const text = (b.dataset.copy || source?.textContent || '').trim();
+					let state = 'copied';
+					try { await navigator.clipboard.writeText(text); }
+					catch {
+						state = 'manual';
+						if (id === request && source?.textContent?.trim() === text) {
+							const selection = getSelection();
+							const range = document.createRange(); range.selectNodeContents(source);
+							selection?.removeAllRanges(); selection?.addRange(range);
+						}
 					}
-					const old = b.textContent;
-					b.textContent = '已复制';
-					setTimeout(() => (b.textContent = old), 1400);
+					if (id !== request) return;
+					clearTimeout(timeout);
+					b.dataset.copyState = state;
+					b.textContent = state === 'copied' ? '已复制' : '手动复制';
+					announcement.textContent = state === 'copied' ? '已复制到剪贴板' : '无法自动复制，请手动复制文字。';
+					timeout = setTimeout(() => { b.textContent = label; delete b.dataset.copyState; announcement.textContent = ''; }, 1700);
 				});
 			});
 		</script>

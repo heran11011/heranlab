@@ -1,6 +1,6 @@
 ---
 title: Agent Skill 集
-summary: 把常用的自动化流程写成 skill，公开在 GitHub。huntingrin 名下 30+ 个公开仓库（截至 2026-11-13）。
+summary: 把常用的自动化流程写成 skill，记录几个公开的工具与工作流。
 group: tools
 kind: 工具
 period: '2026'
@@ -10,16 +10,13 @@ meta:
   - { k: 角色, v: 独立开发 }
   - { k: 时间, v: 2026 至今 }
   - { k: 形式, v: Agent Skill（SKILL.md + 脚本） }
-  - { k: 数量, v: 30+ 个公开仓库（截至 2026-11-13） }
 command:
   text: npx skills add huntingrin/xhs-opportunity-kit
   todo: 待实测
 shots:
   - { caption: 一个 skill 跑起来的样子 }
-links:
-  - { label: GitHub · huntingrin, href: 'https://github.com/huntingrin' }
 sources:
-  - gh repo list huntingrin：非 fork 的公开仓库 34 个（2026-11-13 查询）
+  - 90 秒是 make-90s-tutorial-video 模板的目标时长，不是项目数据。
 ---
 
 ## 几个例子

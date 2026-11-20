@@ -1,0 +1,75 @@
+---
+import { library, platformLabels } from '../../data/library';
+
+// 编辑札记只引用已收录的公开作品，不读取 Obsidian 私有笔记。
+const cases = [
+	{ id: 'dawdex-adventurex', kind: '交互原型', title: '把弹幕变成音乐', question: '不会编曲，也能指挥一间录音棚吗？', takeaway: 'DAWdex 把口语里的风格描述拆成鼓、贝斯和键盘的任务，再把 MIDI 写进 openDAW。公开手记记录的是跑通的第一版。' },
+	{ id: 'wechat-rpa-ai-archive', kind: '流程实验', title: '不再一篇篇手动存文章', question: '重复的保存动作，哪些值得自动化？', takeaway: '用 RPA 执行重复操作，用 Web Clipper 保存文章，再让 AI 参与整理。适合看工具之间怎么接力，而不只是看用了哪些工具。' },
+	{ id: 'wechat-gr3-companion', kind: '产品观察', title: '机器人回看了我一眼', question: '一个没有明确任务的机器人，有什么值得体验？', takeaway: '从触摸、回看和眨眼这几个现场动作出发，记录一次体验如何改变了对“有没有用”的判断。' },
+].flatMap((card) => {
+	const entry = library.find((item) => item.id === card.id);
+	return entry?.cover ? [{ ...card, entry, cover: entry.cover }] : [];
+});
+---
+
+{cases.length > 0 && <section class="case-shelf" data-case-shelf aria-labelledby="case-shelf-title">
+	<header class="shelf-heading">
+		<span class="shelf-kicker">剪报册 / CASE NOTES</span>
+		<h2 id="case-shelf-title">案例架</h2>
+		<p>挑一件打开，看看当时想试什么、做成了什么。</p>
+	</header>
+	<div class="shelf-row">
+		{cases.map(({ entry, cover, kind, title, question, takeaway }, index) => (
+			<details class="shelf-case" data-case-note>
+				<summary>
+					<img src={cover} alt="" width="112" height="84" loading="lazy" decoding="async" />
+					<span class="case-label"><span class="case-index"><span aria-hidden="true">{String(index + 1).padStart(2, '0')} / </span>{kind}</span><span class="case-title">{title}</span></span>
+					<span class="case-toggle" aria-hidden="true"></span>
+				</summary>
+				<div class="case-note">
+					<p class="case-question">{question}</p>
+					<p>{takeaway}</p>
+					<a href={`/content/${entry.id}/`}>读手记 <span aria-hidden="true">↗</span></a>
+					<span class="case-source">来自 {platformLabels[entry.platform]}</span>
+				</div>
+			</details>
+		))}
+	</div>
+</section>}
+
+<style>
+	.case-shelf { margin-bottom: clamp(42px, 6vw, 70px); border-top: 1px solid var(--rule); padding-top: 21px; }
+	.shelf-heading { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 7px 21px; margin-bottom: 21px; }
+	.shelf-kicker { grid-column: 1 / -1; color: var(--accent); }
+	.shelf-kicker, .case-index, .case-source { font: 11px/1.65 var(--mono); }
+	.shelf-heading h2 { margin: 0; font: 400 28px/1.3 var(--serif-zh); }
+	.shelf-heading p { margin: 0; font: 13px/1.7 var(--sans); color: var(--ink-2); }
+	.shelf-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 14px; }
+	.shelf-case { min-width: 0; background: var(--paper-2); border: 1px solid var(--rule); }
+	.shelf-case[open] { border-top-color: var(--accent); }
+	summary { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 14px; align-items: center; gap: 12px; min-height: 76px; padding: 12px; cursor: pointer; list-style: none; }
+	summary::-webkit-details-marker { display: none; }
+	summary img { display: block; width: 56px; height: 42px; object-fit: cover; border: 1px solid var(--rule); background: var(--paper-3); }
+	.case-label { min-width: 0; display: grid; gap: 4px; }
+	.case-index { color: var(--accent); }
+	.case-title { font: 400 17px/1.35 var(--serif-zh); overflow-wrap: anywhere; }
+	.case-toggle { position: relative; height: 14px; color: var(--accent); }
+	.case-toggle::before, .case-toggle::after { content: ''; position: absolute; top: 6px; left: 2px; width: 10px; border-top: 1px solid; }
+	.case-toggle::after { transform: rotate(90deg); }
+	.shelf-case[open] .case-toggle::after { transform: rotate(0deg); }
+	.case-note { margin: 0 12px; padding-top: 12px; border-top: 1px dashed var(--rule); color: var(--ink-2); font: 13px/1.75 var(--sans); }
+	.case-note p { margin: 0 0 9px; }
+	.case-question { color: var(--ink); }
+	.case-note a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-right: 12px; color: var(--accent); }
+	.case-source { display: inline-block; color: var(--ink-3); }
+	:is(summary, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+	@media (hover: hover) and (pointer: fine) { summary:hover .case-title { color: var(--accent); } }
+	@media (prefers-reduced-motion: no-preference) {
+		.case-toggle::after, summary img { transition: transform 240ms var(--decel); }
+		.shelf-case[open] summary img { transform: translateY(-2px) rotate(-3deg); }
+		.shelf-case[open] .case-note { animation: case-note-reveal 280ms var(--decel) both; }
+	}
+	@keyframes case-note-reveal { from { opacity: 0; translate: 0 -5px; } to { opacity: 1; translate: 0 0; } }
+	@media (max-width: 740px) { .shelf-row { grid-template-columns: minmax(0, 1fr); gap: 7px; } }
+	@media (max-width: 370px) { .shelf-heading { grid-template-columns: minmax(0, 1fr); } }
+</style>

@@ -16,10 +16,7 @@
 - X：[Heran](https://x.com/heran_ai)，简介取公开 bio 原句；帖子标题是本人原文的开头摘句，非虚构标题：
   - `2112344331868877238`：本来想试试，让 AI 去给我的手机号充话费。
   - `2109876678747193375`：我发现让 ai 写推特是真的抽象啊。
-- GitHub：[huntingrin](https://github.com/huntingrin)。通过 `https://api.github.com/users/huntingrin` 与 `/users/huntingrin/repos?per_page=100&sort=updated` 读取公开资料；确认精选的三个仓库存在、归本人所有且非 fork。展示快照，无访问时的网络请求：
-  - `xhs-opportunity-kit`：机会管理 SDK。
-  - `seedance-anime-prompt-library`：动画视频提示词库。
-  - `jd-bean-claim`：京东京豆签到 Skill。
+- GitHub：2026-11-20 本人指定个人入口为 [heran11011](https://github.com/heran11011)，已核对公开主页。旧账号头像和此前归入个人卡片的仓库清单移除，不以其他组织或协作仓库代替。
 
 ## 公开边界
 
@@ -30,4 +27,4 @@
 
 ## 更新
 
-资料与链接在 `src/data/accounts.ts`；首页、关于页共用 `AccountCards.astro`，404 页通过 `profile.platforms` 使用同源账号链接。以后更新内容时同时更新核对日期，不把旧快照当实时数字。
+资料与链接在 `src/data/accounts.ts`；内容页封底、关于页共用 `AccountCards.astro`，404 页通过 `profile.platforms` 使用同源账号链接。以后更新内容时同时更新核对日期，不把旧快照当实时数字。

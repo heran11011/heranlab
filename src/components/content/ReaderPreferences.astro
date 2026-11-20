@@ -51,6 +51,16 @@ const { backHref = '/content/', backLabel = '返回内容', nextHref, nextTitle 
 				focus.setAttribute('aria-pressed', String(focused));
 				focus.textContent = focused ? '退出专注' : '专注';
 			};
+			// 从内容目录点击进来时走原历史，保留筛选、字号之外的翻阅状态和滚动位置。
+			const previous = document.referrer ? new URL(document.referrer) : null;
+			if (previous?.origin === location.origin && previous.pathname === '/content/' && history.length > 1) {
+				article.querySelectorAll<HTMLAnchorElement>('a[href="/content/#content-catalog-title"]').forEach((link) => {
+					link.addEventListener('click', (event) => {
+						if (event.defaultPrevented || event.button || location.hash || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+						event.preventDefault(); history.back();
+					}, { signal });
+				});
+			}
 			applySize(read('heran-reader-size'));
 			applyFocus(read('heran-reader-focus'));
 			sizes.forEach((button) => button.addEventListener('click', () => {
@@ -128,6 +138,10 @@ const { backHref = '/content/', backLabel = '返回内容', nextHref, nextTitle 
 	}
 	reader-preferences .reader-size-panel > span { color: var(--reader-muted); }
 	reader-preferences .reader-size-panel > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 10px; }
+	@media (prefers-reduced-motion: no-preference) {
+		reader-preferences details[open] .reader-size-panel { animation: reader-size-unfold 180ms var(--decel) both; }
+	}
+	@keyframes reader-size-unfold { from { opacity: 0; translate: 0 -4px; } to { opacity: 1; translate: 0 0; } }
 	@media (max-width: 600px) {
 		article[data-reader-article] { --reader-font-size: 17px; }
 		article[data-reader-article][data-reader-size='small'] { --reader-font-size: 15px; }

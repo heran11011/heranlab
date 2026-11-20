@@ -16,16 +16,28 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 		entries.map((account, index) => {
 			const panelId = `${groupId}-${index}`;
 			const titleId = `${panelId}-title`;
-			const items = account.href ? account.items.slice(0, 3) : [];
+			const items = account.items.slice(0, 3);
+			const direct = !account.qr && account.href;
 			return (
-				<details class="account-card" name={groupId} data-account={account.id}>
+				<div class:list={['account-tile', { 'account-direct': direct }]} data-account={account.id}>
+					{direct && <a class="account-primary" href={direct} target="_blank" rel="noopener noreferrer">
+						<span class="account-label">{account.label} <span class="account-out" aria-hidden="true">↗</span></span>
+						<span class="account-name">{account.handle || account.name}</span>
+						<span class="account-sr">主页（新窗口打开）</span>
+					</a>}
+				<details class="account-card" name={groupId}>
 					<summary class="account-summary" aria-controls={panelId}>
-						<span class="account-label">{account.label}</span>
-						<span class="account-name">{account.name}</span>
+						{!direct && <><span class="account-label">{account.label}</span><span class="account-name">{account.name}</span></>}
 						<span class="account-toggle" aria-hidden="true" />
-						<span class="account-sr">，账号预览</span>
+						<span class="account-sr">{account.label}账号预览{account.qr ? '及二维码' : ''}</span>
 					</summary>
 					<section class="account-preview" id={panelId} aria-labelledby={titleId} tabindex="0">
+						{account.qr && (
+							<figure class="account-qr">
+								<img src={account.qr.src} alt={account.qr.alt} width={account.id === 'xiaohongshu' ? 987 : 430} height={account.id === 'xiaohongshu' ? 1347 : 430} decoding="async" />
+								<figcaption><span class="account-label">{account.label} / 扫码</span>{account.qr.caption}</figcaption>
+							</figure>
+						)}
 						<header class="account-identity">
 							{account.avatar && (
 								<img class="account-avatar" src={account.avatar} alt={`${account.name}的头像`} width="48" height="48" loading="lazy" decoding="async" />
@@ -43,31 +55,27 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 								<ol>
 									{items.map((item) => (
 										<li>
-											<a href={item.href} target="_blank" rel="noopener noreferrer">
+											<a href={item.href} target={item.href.startsWith('/') ? undefined : '_blank'} rel={item.href.startsWith('/') ? undefined : 'noopener noreferrer'}>
 												<span>{item.title}</span>
 												{item.kind && <small>{item.kind}</small>}
-												<span class="account-link-arrow" aria-hidden="true">↗</span>
+												<span class="account-link-arrow" aria-hidden="true">{item.href.startsWith('/') ? '→' : '↗'}</span>
+												{!item.href.startsWith('/') && <span class="account-sr">（新窗口打开）</span>}
 											</a>
 										</li>
 									))}
 								</ol>
 							</div>
 						)}
-						{account.qr && (
-							<figure class="account-qr">
-								<img src={account.qr.src} alt={account.qr.alt} width="176" height="176" loading="lazy" decoding="async" />
-								<figcaption>{account.qr.caption}</figcaption>
-							</figure>
-						)}
 						{account.note && <p class="account-note">{account.note}</p>}
-						{(account.href || account.verifiedAt) && (
+						{((!direct && account.href) || account.verifiedAt) && (
 							<footer class="account-footer">
-								{account.href && <a class="account-home" href={account.href} target="_blank" rel="noopener noreferrer">去主页 <span aria-hidden="true">↗</span><span class="account-sr">（新窗口打开）</span></a>}
+								{!direct && account.href && <a class="account-home" href={account.href} target="_blank" rel="noopener noreferrer">去主页 <span aria-hidden="true">↗</span><span class="account-sr">（新窗口打开）</span></a>}
 								{account.verifiedAt && <span class="account-verified">核对于 {account.verifiedAt}</span>}
 							</footer>
 						)}
 					</section>
 				</details>
+				</div>
 			);
 		})
 	}
@@ -83,7 +91,8 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 			const { signal } = controller;
 			const cards = Array.from(this.querySelectorAll<HTMLDetailsElement>('.account-card'));
 			const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-			const desktop = matchMedia('(min-width: 861px)');
+			const desktop = matchMedia('(min-width: 861px) and (min-height: 420px)');
+			this.dataset.enhanced = '';
 			let hovered: HTMLDetailsElement | null = null;
 			let leaveTimer: ReturnType<typeof setTimeout> | undefined;
 			let frame = 0;
@@ -92,13 +101,13 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 				// 原生 details 在无 JS 时自行报告状态；增强后再添加显式 ARIA。
 				card.querySelector('summary')?.setAttribute('aria-expanded', String(card.open));
 			};
-			const close = (card: HTMLDetailsElement, returnFocus = false) => {
+			const close = (card: HTMLDetailsElement) => {
 				const focusedInPanel = card.querySelector('.account-preview')?.contains(document.activeElement);
 				card.open = false;
 				delete card.dataset.positioned;
 				if (hovered === card) hovered = null;
 				sync(card);
-				if (returnFocus || focusedInPanel) card.querySelector('summary')?.focus({ preventScroll: true });
+				if (focusedInPanel) card.querySelector('summary')?.focus({ preventScroll: true });
 			};
 			const place = (card: HTMLDetailsElement) => {
 				if (!card.open) return;
@@ -110,20 +119,22 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 				if (!panel) return;
 				card.dataset.positioned = '';
 				const rect = card.getBoundingClientRect();
-				const width = panel.getBoundingClientRect().width;
+				const width = panel.offsetWidth;
 				const edge = 16;
 				const topBar = parseFloat(getComputedStyle(this).getPropertyValue('--top')) || 0;
 				const ceiling = Math.min(topBar + edge, window.innerHeight - edge);
 				const below = window.innerHeight - edge - rect.bottom - 8;
 				const above = rect.top - ceiling - 8;
-				const useBelow = below >= Math.min(panel.scrollHeight, 240) || below >= above;
+				const qr = panel.querySelector<HTMLElement>('.account-qr');
+				const firstBlock = qr ? qr.offsetHeight + 32 : 180;
+				const useBelow = below >= Math.min(panel.scrollHeight, firstBlock) || below >= above;
 				let height = Math.min(512, Math.max(0, useBelow ? below : above));
-				// 空间不足时允许覆盖卡片，但始终留在可见视口并可滚动。
-				const overlap = height < 160;
-				if (overlap) height = Math.max(0, window.innerHeight - ceiling - edge);
+				// 有码时优先给二维码完整高度；直达卡的面板不压住主页链接。
+				const overlap = !!qr && height < firstBlock;
+				if (overlap) height = Math.max(0, Math.min(512, window.innerHeight - ceiling - edge));
 				panel.style.setProperty('--preview-height', `${height}px`);
-				// 向上展开必须按实际高度贴住卡片，而不是按 max-height 留出空洞。
-				const actualHeight = panel.getBoundingClientRect().height;
+				panel.dataset.edge = overlap || useBelow ? 'top' : 'bottom';
+				const actualHeight = panel.offsetHeight;
 				const top = overlap ? ceiling : useBelow ? rect.bottom + 8 : rect.top - actualHeight - 8;
 				const left = Math.max(edge, Math.min(rect.left, document.documentElement.clientWidth - width - edge));
 				panel.style.setProperty('--preview-left', `${left - rect.left}px`);
@@ -135,8 +146,8 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 			const scheduleClose = (card: HTMLDetailsElement) => {
 				clearTimeout(leaveTimer);
 				leaveTimer = setTimeout(() => {
-					if (hovered === card && !card.matches(':hover') && !card.contains(document.activeElement)) close(card);
-				}, 180);
+					if (hovered === card && !card.parentElement?.matches(':hover') && !card.parentElement?.contains(document.activeElement)) close(card);
+				}, 240);
 			};
 
 			cards.forEach((card) => {
@@ -146,27 +157,44 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 					else { delete card.dataset.positioned; if (hovered === card) hovered = null; }
 					sync(card);
 				}, { signal });
-				card.addEventListener('pointerenter', (event) => {
-					if (!finePointer.matches || event.pointerType === 'touch') return;
+				const tile = card.parentElement!;
+				tile.addEventListener('pointerenter', (event) => {
+					if (!finePointer.matches || !desktop.matches || event.pointerType === 'touch') return;
 					clearTimeout(leaveTimer);
 					// 不让路过的鼠标打断另一张便签内的键盘阅读。
-					if (cards.some((other) => other !== card && other.open && other.contains(document.activeElement))) return;
+					if (cards.some((other) => other !== card && other.open && other.parentElement?.contains(document.activeElement))) return;
 					if (!card.open) {
 						closeOthers(card);
 						hovered = card;
 						card.open = true;
+						const panel = card.querySelector<HTMLElement>('.account-preview');
+						if (panel) panel.scrollTop = 0;
 						sync(card);
 						place(card);
 					}
 				}, { signal });
-				card.addEventListener('pointerleave', () => { if (hovered === card) scheduleClose(card); }, { signal });
-				card.addEventListener('focusout', () => { if (hovered === card) scheduleClose(card); }, { signal });
-				card.querySelector('summary')?.addEventListener('click', (event) => {
+				tile.addEventListener('pointerleave', () => { if (hovered === card) scheduleClose(card); }, { signal });
+				tile.addEventListener('focusout', () => { if (hovered === card) scheduleClose(card); }, { signal });
+				const summary = card.querySelector('summary');
+				summary?.addEventListener('click', (event) => {
 					// 悬停已打开时，第一次鼠标点击固定便签；再次点击才收起。
 					if (hovered === card && card.open && event.detail > 0) {
 						event.preventDefault();
 						hovered = null;
 						clearTimeout(leaveTimer);
+						return;
+					}
+					if (!desktop.matches && !card.open) {
+						requestAnimationFrame(() => {
+							if (signal.aborted || !card.open) return;
+							const topBar = parseFloat(getComputedStyle(this).getPropertyValue('--top')) || 0;
+							const source = summary.getBoundingClientRect();
+							const code = card.querySelector('.account-qr img')?.getBoundingClientRect();
+							// 同组上一张收起会移动当前入口；只在入口或二维码被移出视口时补偿。
+							if (source.top < topBar || (code && code.bottom > window.innerHeight - 8)) {
+								window.scrollBy({ top: source.top - topBar - 12, behavior: 'instant' });
+							}
+						});
 					}
 				}, { signal });
 			});
@@ -183,22 +211,24 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 			});
 			window.addEventListener('resize', reposition, { passive: true, signal });
 			window.addEventListener('scroll', reposition, { capture: true, passive: true, signal });
-			desktop.addEventListener('change', reposition, { signal });
+			desktop.addEventListener('change', () => { if (hovered) close(hovered); reposition(); }, { signal });
 			finePointer.addEventListener('change', () => { if (hovered) close(hovered); }, { signal });
 			document.addEventListener('pointerdown', (event) => {
 				const target = event.target;
-				if (target instanceof Node) cards.forEach((card) => { if (card.open && !card.contains(target)) close(card); });
+				// 同组入口留给原生 details 切换；抢在 pointerdown 收起会让触屏目标移位。
+				if (target instanceof Node && !this.contains(target)) cards.forEach((card) => { if (card.open) close(card); });
 			}, { signal });
 			document.addEventListener('keydown', (event) => {
 				if (event.key !== 'Escape' || event.defaultPrevented) return;
 				const card = cards.find((entry) => entry.open);
 				const focusedGroup = document.activeElement?.closest('account-cards');
 				if (!card || (focusedGroup && focusedGroup !== this)) return;
-				event.preventDefault();
+				if (card.parentElement?.contains(document.activeElement)) event.preventDefault();
 				clearTimeout(leaveTimer);
-				close(card, true);
+				close(card);
 			}, { signal });
 			this.cleanup = () => {
+				delete this.dataset.enhanced;
 				controller.abort();
 				observer.disconnect();
 				clearTimeout(leaveTimer);
@@ -222,6 +252,7 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 		gap: 10px;
 		align-items: start;
 	}
+	.account-tile { position: relative; min-width: 0; }
 	.account-card {
 		position: relative;
 		min-width: 0;
@@ -231,6 +262,15 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 		font-size: 15px;
 	}
 	.account-card[open] { border-color: var(--ink-3); }
+	.account-primary {
+		position: absolute; z-index: 1; inset: 1px 49px auto 1px; min-height: 68px;
+		display: grid; align-content: center; gap: 2px; padding: 8px 6px 8px 15px;
+		border-radius: var(--r) 0 0 var(--r); text-decoration: none;
+	}
+	.account-primary .account-name { grid-column: auto; }
+	.account-out { display: inline-block; color: var(--accent); }
+	.account-direct .account-summary { width: 46px; min-height: 68px; margin-left: auto; padding: 0; place-content: center; grid-template-columns: auto; }
+	.account-direct .account-toggle { grid-column: 1; grid-row: 1; }
 	.account-summary {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
@@ -251,9 +291,12 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 	.account-summary .account-label { grid-column: 1; margin-bottom: 2px; }
 	.account-name { grid-column: 1; overflow-wrap: anywhere; }
 	.account-toggle { grid-column: 2; grid-row: 1 / 3; align-self: center; font-family: var(--mono); color: var(--ink-3); }
-	.account-toggle::before { content: '+'; }
-	.account-card[open] .account-toggle::before { content: '−'; color: var(--accent); }
-	.account-summary:focus-visible, .account-preview a:focus-visible {
+	.account-toggle { position: relative; display: block; width: 14px; height: 14px; }
+	.account-toggle::before, .account-toggle::after { content: ''; position: absolute; top: 6px; left: 1px; width: 12px; border-top: 1px solid; }
+	.account-toggle::after { transform: rotate(90deg); }
+	.account-card[open] .account-toggle { color: var(--accent); }
+	.account-card[open] .account-toggle::after { transform: rotate(0deg); }
+	.account-primary:focus-visible, .account-summary:focus-visible, .account-preview a:focus-visible {
 		outline: 2px solid var(--accent);
 		outline-offset: 3px;
 	}
@@ -281,9 +324,11 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 	.account-items a:hover > span:first-child { text-decoration: underline; text-underline-offset: 3px; }
 	.account-items small { grid-column: 1; font-size: 11px; color: var(--ink-3); margin-top: 3px; }
 	.account-link-arrow { grid-column: 2; grid-row: 1; }
-	.account-qr { margin: 20px 0 0; padding-top: 18px; border-top: 1px dashed var(--rule); }
-	.account-qr img { width: min(176px, 100%); height: auto; margin: 0 auto; border: 1px solid var(--rule); border-radius: 3px; }
-	.account-qr figcaption { margin-top: 9px; color: var(--ink-2); font-size: 12px; text-align: center; text-wrap: pretty; }
+	.account-qr { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 14px; align-items: center; margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px dashed var(--rule); }
+	.account-qr img { display: block; width: 100%; height: auto; background: white; border: 1px solid var(--rule); }
+	.account-tile[data-account='xiaohongshu'] .account-qr img { max-width: 144px; }
+	.account-qr figcaption { color: var(--ink); font-size: 13px; line-height: 1.6; text-wrap: pretty; }
+	.account-qr figcaption .account-label { margin-bottom: 6px; color: var(--accent); }
 	.account-note { margin: 16px 0 0; padding-left: 10px; border-left: 2px solid var(--marker); font-size: 12px; color: var(--ink-2); }
 	.account-footer { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--rule); }
 	.account-home { color: var(--accent); text-decoration: none; font-size: 14px; }
@@ -292,16 +337,19 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 	.account-sr { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 	@media (hover: hover) and (pointer: fine) {
-		.account-summary:hover { background: var(--paper-3); }
+		.account-summary:hover, .account-primary:hover { background: var(--paper-3); }
+		.account-primary:hover .account-out { transform: translate(2px, -2px); }
 		.account-summary:hover .account-toggle { color: var(--accent); }
 	}
-	@media (min-width: 861px) {
-		.account-card[open] { z-index: 8; }
-		.account-preview {
+	@media (min-width: 861px) and (min-height: 420px) {
+		.account-tile:has(.account-card[open]) { z-index: 8; }
+		.account-card[data-positioned] .account-preview {
 			position: absolute;
+			z-index: 2;
+			padding: 14px;
 			top: var(--preview-top, calc(100% + 8px));
 			left: var(--preview-left, 0px);
-			width: 100%; /* 无 JS 时与小卡片等宽，不越过网格边界。 */
+			width: min(380px, calc(100vw - 32px));
 			max-height: min(var(--preview-height, 60vh), 32rem);
 			overflow-y: auto;
 			overscroll-behavior-y: contain;
@@ -310,15 +358,18 @@ const groupId = `accounts-${crypto.randomUUID()}`;
 			border-radius: var(--r);
 			box-shadow: 0 2px 0 var(--rule), 0 16px 32px -16px rgba(35, 37, 31, 0.3);
 		}
-		.account-card[data-positioned] .account-preview { width: min(380px, calc(100vw - 32px)); }
-		.account-card[open] .account-preview { animation: account-unfold 0.14s ease-out; }
 	}
-	@media (max-width: 860px) {
-		.account-card[open] { grid-column: 1 / -1; }
-		.account-preview { max-height: min(38rem, 70vh); overflow-y: auto; overscroll-behavior-y: contain; }
+	@media (max-width: 600px) { .account-grid { grid-template-columns: minmax(0, 1fr); } }
+	@media (min-width: 601px) { .account-tile:has(details[open]) { grid-column: 1 / -1; } }
+	@media (min-width: 861px) and (min-height: 420px) { .account-grid[data-enhanced] .account-tile:has(details[open]) { grid-column: auto; } }
+	@media (max-width: 360px) { .account-qr { grid-template-columns: minmax(0, 132px) minmax(0, 1fr); } }
+	@media (prefers-reduced-motion: no-preference) {
+		.account-toggle::after, .account-out { transition: transform 220ms var(--decel); }
+		.account-card[data-positioned][open] .account-preview { animation: account-unfold 250ms var(--decel); transform-origin: left top; }
+		.account-card[data-positioned][open] .account-preview[data-edge='bottom'] { transform-origin: left bottom; --fold-y: 7px; --fold-tilt: 9deg; }
+		.account-card:not([data-positioned])[open] .account-preview { animation: account-inline 220ms var(--decel); }
 	}
-	@keyframes account-unfold { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
-	@media (prefers-reduced-motion: reduce) {
-		.account-card[open] .account-preview { animation: none; }
-	}
+	@keyframes account-unfold { from { opacity: 0; transform: perspective(700px) translateY(var(--fold-y, -7px)) rotateX(var(--fold-tilt, -9deg)); } to { opacity: 1; transform: none; } }
+	@keyframes account-inline { from { opacity: 0; } to { opacity: 1; } }
+	@media (prefers-reduced-motion: reduce) { .account-primary:hover .account-out { transform: none; } }
 </style>

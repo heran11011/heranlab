@@ -29,9 +29,9 @@ const pages = [
 		</div>
 	</div>
 	<div class="portal-controls" data-portal-controls hidden>
-		<button type="button" data-portal-prev aria-label="上一张纸签">←</button>
-		<span class="portal-hint" data-portal-hint>左右拖动，随手翻翻。</span>
-		<button type="button" class="portal-next" data-portal-next>翻一张 <span aria-hidden="true">→</span></button>
+		<button type="button" data-portal-prev><span aria-hidden="true">←</span> 上一张</button>
+		<span class="portal-hint" data-portal-hint>也可左右拖动</span>
+		<button type="button" data-portal-next>下一张 <span aria-hidden="true">→</span></button>
 	</div>
 	<p class="sr-only" data-portal-status role="status" aria-live="polite" aria-atomic="true">第 1 张，共 4 张：内容</p>
 	<noscript><nav class="portal-fallback" aria-label="直接前往">{pages.map((page) => <a href={page.href}>{page.label} ↗</a>)}</nav></noscript>
@@ -49,7 +49,8 @@ const pages = [
 		const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 		const fine = matchMedia('(hover: hover) and (pointer: fine)');
 		let current = 0, requested = 0;
-		let queued: number | null = null;
+		type Turn = { index: number; direction: 1 | -1 };
+		let queued: Turn | null = null;
 		let running = false;
 		let animations: Animation[] = [];
 		let rebound: Animation | null = null;
@@ -78,7 +79,7 @@ const pages = [
 			desk.removeAttribute('data-turning');
 			resetLean();
 		};
-		const flip = async (index: number) => {
+		const flip = async ({ index, direction }: Turn) => {
 			cancelRebound();
 			if (index === current) { settle(index); return; }
 			const outgoing = sheets[current], incoming = sheets[index];
@@ -93,24 +94,38 @@ const pages = [
 			outgoing.setAttribute('aria-hidden', 'true');
 			outgoing.classList.add('is-leaving');
 			stage.setAttribute('aria-busy', 'true');
-			desk.setAttribute('data-turning', '');
+			desk.dataset.turning = direction === 1 ? 'next' : 'previous';
 			selectTabs(index);
 			const initial = outgoing.style.transform || 'none';
-			const lift = 'translateY(-32%) translateX(-5%) rotate(-4deg) scale(.97)';
-			const duration = 620;
+			// 下一张往左抽，上一张往右抽。视口窄时缩短横向行程，不裁纸边。
+			const frame = stage.getBoundingClientRect();
+			const room = direction === 1 ? frame.left : innerWidth - frame.right;
+			const travel = direction * Math.min(30, Math.max(0, room - 12));
+			const pose = (x: number, y: number, angle: number, scale: number) =>
+				`translate(${x * travel}px, ${y}%) rotate(${angle * direction}deg) scale(${scale})`;
+			const lift = pose(-1, -34, -4, .97);
+			const parked = pose(-.1, 2.5, -1.6, .98);
+			const under = pose(.25, 2.5, 1.6, .982);
+			const duration = 860;
+			const options: KeyframeAnimationOptions = { duration, fill: 'both' };
 			animations = [
 				outgoing.animate([
-					{ transform: initial, zIndex: 3, offset: 0, easing: 'cubic-bezier(.22,.65,.3,1)' },
-					{ transform: lift, zIndex: 3, offset: .43 },
-					{ transform: lift, zIndex: 3, offset: .5 },
-					{ transform: lift, zIndex: 0, offset: .51, easing: 'cubic-bezier(.16,1,.3,1)' },
-					{ transform: 'translateY(9px) rotate(-2deg) scale(.98)', zIndex: 0, offset: 1 },
-				], { duration, easing: 'linear', fill: 'both' }),
+					{ transform: initial, offset: 0, easing: 'cubic-bezier(.25,.15,.24,1)' },
+					{ transform: lift, offset: .47, easing: 'cubic-bezier(.42,0,.22,1)' },
+					{ transform: parked, offset: 1 },
+				], options),
+				// 运动与换层分开：在抬到最高处才换层，不为换层停一拍。
+				outgoing.animate([
+					{ zIndex: 3, offset: 0, easing: 'steps(1, end)' },
+					{ zIndex: 0, offset: .47 },
+					{ zIndex: 0, offset: 1 },
+				], options),
 				incoming.animate([
-					{ transform: 'translateY(7px) rotate(1deg) scale(.985)', offset: 0 },
-					{ transform: 'translateY(7px) rotate(1deg) scale(.985)', offset: .38, easing: 'cubic-bezier(.16,1,.3,1)' },
+					{ transform: under, offset: 0 },
+					{ transform: under, offset: .25, easing: 'cubic-bezier(.2,.64,.22,1)' },
+					{ transform: pose(.04, -.4, .15, 1), offset: .78, easing: 'cubic-bezier(.2,0,.3,1)' },
 					{ transform: 'none', offset: 1 },
-				], { duration, easing: 'linear', fill: 'both' }),
+				], options),
 			];
 			await Promise.all(animations.map((animation) => animation.finished.catch(() => {})));
 			settle(index);
@@ -121,28 +136,30 @@ const pages = [
 			queued = null;
 			if (destination !== null) void flip(destination);
 		};
-		const request = (index: number) => {
+		const request = (index: number, direction: 1 | -1 = index < requested ? -1 : 1) => {
 			requested = normalized(index);
-			if (running) queued = requested;
-			else void flip(requested);
+			const turn = { index: requested, direction };
+			if (running) queued = turn;
+			else void flip(turn);
 		};
+		const step = (direction: 1 | -1) => request(requested + direction, direction);
 		tabs.forEach((tab, index) => {
 			tab.addEventListener('click', () => request(index));
 			tab.addEventListener('keydown', (event) => {
 				if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
 				event.preventDefault();
 				const target = event.key === 'Home' ? 0 : event.key === 'End' ? sheets.length - 1 : normalized(index + (event.key === 'ArrowRight' ? 1 : -1));
-				request(target);
+				request(target, event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : target < requested ? -1 : 1);
 				tabs[target].focus({ preventScroll: true });
 			});
 		});
-		previous.addEventListener('click', () => request(requested - 1));
-		next.addEventListener('click', () => request(requested + 1));
+		previous.addEventListener('click', () => step(-1));
+		next.addEventListener('click', () => step(1));
 		stage.addEventListener('keydown', (event) => {
 			if (event.target instanceof Element && event.target.closest('a, button')) return;
 			if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
 			event.preventDefault();
-			request(requested + (event.key === 'ArrowRight' ? 1 : -1));
+			step(event.key === 'ArrowRight' ? 1 : -1);
 		});
 		stage.addEventListener('pointerdown', (event) => {
 			if (running || (event.pointerType === 'mouse' && event.button !== 0) || !event.isPrimary) return;
@@ -188,7 +205,7 @@ const pages = [
 			const threshold = Math.min(72, sheets[current].getBoundingClientRect().width * .22);
 			const recentVelocity = performance.now() - gesture.lastTime <= 120 ? gesture.velocity : 0;
 			const commit = !cancelled && (Math.abs(gesture.dx) > threshold || (Math.abs(gesture.dx) > 30 && Math.abs(recentVelocity) > .45));
-			if (commit) { request(requested + (gesture.dx < 0 ? 1 : -1)); return; }
+			if (commit) { step(gesture.dx < 0 ? 1 : -1); return; }
 			const sheet = sheets[current], initial = sheet.style.transform || 'none';
 			sheet.style.removeProperty('transform');
 			cancelRebound();
@@ -245,7 +262,7 @@ const pages = [
 	.portal-controls { display: flex; align-items: center; justify-content: space-between; gap: 7px; margin-top: 21px; }
 	.portal-controls button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding: 7px 12px; border: 1px solid var(--rule); background: transparent; color: var(--ink-2); font: 12px var(--sans); cursor: pointer; transition: background var(--motion-fast) var(--decel); }
 	.portal-controls button:hover { background: var(--paper-3); color: var(--accent); }
-	.portal-next { gap: 14px; }
+	.portal-controls button { gap: 7px; }
 	.portal-hint { color: var(--ink-3); font: 10px/1.6 var(--sans); text-align: center; }
 	.portal-tabs[hidden], .portal-controls[hidden] { display: none; }
 	.portal-fallback { display: flex; flex-wrap: wrap; gap: 14px; padding-top: 21px; }
@@ -256,6 +273,13 @@ const pages = [
 	.portal-desk[data-ready] .portal-sheet { cursor: grab; }
 	.is-dragging .portal-sheet { cursor: grabbing; user-select: none; }
 	.portal-sheet:focus-visible, :is(a, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+	.portal-controls button:active { background: var(--paper-3); color: var(--accent); }
+	@media (prefers-reduced-motion: no-preference) {
+		.portal-open span { display: inline-block; transition: transform var(--motion-ui) var(--decel); }
+		.portal-open:is(:hover, :focus-visible) span { transform: translate(2px, -2px); }
+		.portal-controls button { transition: background var(--motion-fast) var(--decel), transform var(--motion-fast) var(--decel); }
+		.portal-controls button:active { transform: translateY(1px); }
+	}
 	@media (max-width: 800px) {
 		.portal-desk { justify-self: center; max-width: 460px; }
 		.portal-face { min-height: 300px; padding: 21px 24px; }

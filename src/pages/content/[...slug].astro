@@ -42,7 +42,7 @@ const sourceLinkLabel = isVideo ? videoLink : '查看原文';
 <Base title={item.title} description={item.excerpt} type="article">
 	<article class:list={['content-detail', { 'is-video': isVideo, 'is-short': isShort, 'is-article': isArticle, 'has-image': !!detailCover }]} data-reader-article data-reader-format={item.format} data-focused="false">
 		<nav class="content-back" aria-label="返回目录">
-			<a href="/content/"><span aria-hidden="true">←</span> 返回内容</a>
+			<a href="/content/#content-catalog-title"><span aria-hidden="true">←</span> 返回内容</a>
 			<span>禾冉的剪报 / heran</span>
 		</nav>
 
@@ -52,7 +52,7 @@ const sourceLinkLabel = isVideo ? videoLink : '查看原文';
 			{!isShort && <p class="content-excerpt" data-reader-secondary>{item.excerpt}</p>}
 		</header>
 
-		<ReaderPreferences nextHref={next && `/content/${next.id}/`} nextTitle={next?.title} />
+		<ReaderPreferences backHref="/content/#content-catalog-title" nextHref={next && `/content/${next.id}/`} nextTitle={next?.title} />
 
 		<div class="content-reading-layout">
 			{!isArticle && (detailCover || isVideo) && <div class="content-media">
@@ -106,8 +106,8 @@ const sourceLinkLabel = isVideo ? videoLink : '查看原文';
 		<nav class="content-pagination" aria-label="继续翻阅" data-reader-pagination>
 			<p><span aria-hidden="true">02 /</span> 接着翻一页</p>
 			<div>
-				{previous ? <a href={`/content/${previous.id}/`} rel="prev"><span>← 上一篇</span><strong>{previous.title}</strong></a> : <a href="/content/"><span>← 第一页</span><strong>回到内容目录</strong></a>}
-				{next ? <a href={`/content/${next.id}/`} rel="next"><span>下一篇 →</span><strong>{next.title}</strong></a> : <a href="/content/"><span>这一册，暂时翻到这里</span><strong>回到内容目录 →</strong></a>}
+				{previous ? <a href={`/content/${previous.id}/`} rel="prev"><span>← 上一篇</span><strong>{previous.title}</strong></a> : <a href="/content/#content-catalog-title"><span>← 第一页</span><strong>回到内容目录</strong></a>}
+				{next ? <a href={`/content/${next.id}/`} rel="next"><span>下一篇 →</span><strong>{next.title}</strong></a> : <a href="/content/#content-catalog-title"><span>这一册，暂时翻到这里</span><strong>回到内容目录 →</strong></a>}
 			</div>
 		</nav>
 	</article>

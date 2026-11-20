@@ -1,7 +1,11 @@
 ---
 import PortalDesk from '../components/home/PortalDesk.astro';
 import { profile } from '../data/profile';
+import { library } from '../data/library';
 import Base from '../layouts/Base.astro';
+
+// 只选已经核验并收录的公开内容，不直接读取或发布笔记。
+const deskPick = library.find((entry) => entry.id === 'dawdex-adventurex');
 ---
 
 <Base description="禾冉的个人网站。翻一张纸签，去看看笔记、视频和自己做的小工具。">
@@ -12,13 +16,60 @@ import Base from '../layouts/Base.astro';
 			<p class="home-line">写下来的，<br />和做出来的。</p>
 			<p class="home-note">笔记、视频和小工具，都收在这里。</p>
 		</div>
-		<PortalDesk />
+		<div class="home-deck"><PortalDesk /></div>
+		{deskPick?.cover && <a class="home-pick" data-home-pick href={`/content/${deskPick.id}/`}>
+			<span class="pick-photo"><span class="pick-frame"><img src={deskPick.cover} alt="" width="144" height="90" decoding="async" /></span></span>
+			<span class="pick-copy">
+				<span class="pick-label">桌上选件 · 项目手记</span>
+				<span class="pick-title">把弹幕变成音乐 <span aria-hidden="true">↗</span></span>
+				<span class="pick-note">DAWdex / 黑客松作品</span>
+			</span>
+		</a>}
 	</section>
 </Base>
 
+<script>
+	// 装饰层只在画面已加载、相纸进入视口时播放一次；无 JS 时相纸照常可见。
+	const frame = document.querySelector<HTMLElement>('[data-home-pick] .pick-frame');
+	const image = frame?.querySelector('img');
+	const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+	if (frame && image && !reducedMotion.matches && 'IntersectionObserver' in window) {
+		const observer = new IntersectionObserver(([entry]) => {
+			if (!entry?.isIntersecting || entry.intersectionRatio < .6) return;
+			observer.disconnect();
+			void image.decode().then(() => {
+				if (frame.isConnected && !reducedMotion.matches) frame.dataset.pixelReveal = '';
+			}).catch(() => { /* 图片降级由浏览器处理；不盖上动效遮罩。 */ });
+		}, { threshold: .6 });
+		observer.observe(frame);
+	}
+</script>
+
 <style>
-	.home-portal { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: center; gap: clamp(28px, 6vw, 84px); min-height: calc(100svh - var(--top) - 112px); padding: 56px 21px 70px; }
-	.home-intro { min-width: 0; padding-bottom: 14px; }
+	.home-portal { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); grid-template-areas: 'intro deck' 'pick deck'; align-content: center; align-items: center; column-gap: clamp(28px, 6vw, 84px); row-gap: 28px; min-height: calc(100svh - var(--top) - 112px); padding: 56px 21px 70px; }
+	.home-intro { grid-area: intro; min-width: 0; align-self: end; }
+	.home-deck { display: grid; grid-area: deck; min-width: 0; }
+	.home-pick { grid-area: pick; align-self: start; justify-self: start; display: grid; grid-template-columns: minmax(72px, 112px) minmax(0, 1fr); gap: 14px; align-items: center; max-width: 100%; color: var(--ink); text-decoration: none; border-top: 1px solid var(--rule); padding-block: 14px 7px; }
+	.pick-photo { display: block; padding: 4px 4px 8px; background: var(--paper-2); border: 1px solid var(--rule); box-shadow: var(--shadow-paper); transform: rotate(-2deg); transition: transform var(--motion-ui) var(--decel); }
+	.pick-frame { display: block; position: relative; overflow: hidden; }
+	.pick-photo img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; }
+	@media (prefers-reduced-motion: no-preference) {
+		.pick-frame[data-pixel-reveal]::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, var(--paper-3) 0 3px, var(--paper-2) 3px 6px); box-shadow: inset 2px 0 var(--accent); animation: develop-pixel-photo 360ms steps(8, end) both; }
+	}
+	@keyframes develop-pixel-photo {
+		from { transform: translateX(0); }
+		to { transform: translateX(100%); }
+	}
+	.pick-copy { display: grid; gap: 4px; }
+	.pick-label, .pick-note { font: 11px/1.6 var(--mono); }
+	.pick-label, .pick-title span { color: var(--accent); }
+	.pick-note { color: var(--ink-3); }
+	.pick-title { font: 400 19px/1.35 var(--serif-zh); }
+	.pick-title span { display: inline-block; font-size: 13px; margin-inline-start: 3px; }
+	.home-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+	.home-pick:focus-visible .pick-photo { transform: rotate(0); }
+	@media (hover: hover) and (pointer: fine) { .home-pick:hover .pick-photo { transform: translateY(-3px) rotate(0); } }
+	@media (prefers-reduced-motion: reduce) { .home-pick .pick-photo { transform: none; transition: none; } }
 	.home-owner { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--ink-2); margin: 0; }
 	.home-owner img { width: 44px; height: 44px; border-radius: var(--avatar-radius); }
 	h1 { font: 400 clamp(96px, 10vw, 144px)/.9 var(--serif-en); letter-spacing: -.04em; margin: 28px 0; }
@@ -26,8 +77,8 @@ import Base from '../layouts/Base.astro';
 	.home-line { font: 400 clamp(27px, 2.6vw, 36px)/1.5 var(--serif-zh); letter-spacing: -.025em; margin: 0; }
 	.home-note { margin: 21px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.85; text-wrap: pretty; }
 	@media (max-width: 800px) {
-		.home-portal { grid-template-columns: minmax(0, 1fr); min-height: auto; gap: 35px; padding: 28px 0 42px; }
-		.home-intro { padding: 0; }
+		.home-portal { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'intro' 'deck' 'pick'; min-height: auto; gap: 35px; padding: 28px 0 42px; }
+		.home-pick { margin-inline: 7px; }
 		h1 { font-size: clamp(78px, 20vw, 108px); margin: 14px 0; }
 		.home-line { font-size: 24px; }
 		.home-line br { display: none; }

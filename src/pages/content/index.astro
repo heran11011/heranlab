@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import AccountCards from '../../components/content/AccountCards.astro';
+import AccountCards from '../../components/AccountCards.astro';
+import CaseShelf from '../../components/content/CaseShelf.astro';
 import LibraryCard from '../../components/content/LibraryCard.astro';
 import { library, platformLabels } from '../../data/library';
 import Base from '../../layouts/Base.astro';
@@ -25,6 +26,10 @@ const filters = [
 				<h1>写下的，<br />做过的。</h1>
 				<p class="content-deck">笔记、帖子、视频，还有文章。<br />把散在不同地方的内容，收在同一册里。</p>
 				<p class="content-hero-note">保留原题与出处，能在这里读，也能回到原文。</p>
+				<nav class="content-jumps" aria-label="本册快捷入口">
+					<a href="#content-catalog-title">翻到目录 <span aria-hidden="true">↓</span></a>
+					<a href="#content-accounts-title">去封底 <span aria-hidden="true">↓</span></a>
+				</nav>
 			</div>
 			<aside class="content-overview" aria-label="内容收录总览">
 				<div class="content-overview-top"><span>本册目录</span><span aria-hidden="true">INDEX / 01</span></div>
@@ -38,9 +43,11 @@ const filters = [
 			</aside>
 		</header>
 
+		<CaseShelf />
+
 		<content-library class="content-library" data-view="illustrated">
 			<div class="content-catalog-heading">
-				<h2 id="content-catalog-title">翻阅内容</h2>
+				<h2 id="content-catalog-title" tabindex="-1">翻阅内容</h2>
 				<span>按平台找，或搜一个词。</span>
 			</div>
 			<div class="content-controls" data-library-controls hidden>
@@ -52,7 +59,7 @@ const filters = [
 				<form class="content-search" role="search" aria-label="搜索内容">
 					<label for="content-search-input">搜索标题、主题或简介</label>
 					<div class="content-search-field">
-						<input id="content-search-input" type="search" name="q" placeholder="试试 AI、工作流…" autocomplete="off" aria-controls="content-results" />
+						<input id="content-search-input" type="search" name="q" maxlength="120" placeholder="试试 AI、工作流…" autocomplete="off" aria-controls="content-results" />
 						<span aria-hidden="true">⌕</span>
 					</div>
 				</form>
@@ -103,8 +110,8 @@ const filters = [
 		<section class="content-accounts-section" aria-labelledby="content-accounts-title">
 			<header>
 				<p class="content-eyebrow">封底 / 账号入口</p>
-				<h2 id="content-accounts-title">也可以在这些地方找到我</h2>
-				<p>公众号扫码关注，其他平台可以直接去主页翻。</p>
+				<h2 id="content-accounts-title" tabindex="-1">也可以在这些地方找到我</h2>
+				<p>公众号和小红书可以扫码；其他平台点名称去主页，点加号看简介。</p>
 			</header>
 			<AccountCards />
 		</section>
@@ -136,8 +143,21 @@ const filters = [
 			const archive = this.querySelector<HTMLElement>('[data-library-archive]');
 			const normalize = (text: string) => text.normalize('NFKC').toLocaleLowerCase('zh-CN');
 			const searchable = entries.map((element) => ({ element, text: normalize(element.dataset.search || '') }));
-			const initialPlatform = new URLSearchParams(window.location.search).get('platform') || 'all';
+			// 用当前历史记录保留翻阅状态，返回、刷新能恢复；搜索词不写到网址。
+			const remembered = window.history.state?.heranCatalog;
+			const initialPlatform = remembered?.platform ?? new URLSearchParams(window.location.search).get('platform') ?? 'all';
 			let platform = buttons.some((button) => button.dataset.filter === initialPlatform) ? initialPlatform : 'all';
+			if (typeof remembered?.query === 'string') input.value = remembered.query.slice(0, input.maxLength);
+			const remember = () => {
+				try { history.replaceState({ ...history.state, heranCatalog: { platform, query: input.value, view: this.dataset.view } }, ''); } catch {}
+			};
+			const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+			const results = this.querySelector('#content-results');
+			let refresh: Animation | undefined;
+			const showChange = () => {
+				refresh?.cancel();
+				if (!reduce.matches) refresh = results?.animate?.([{ opacity: .66, translate: '0 4px' }, { opacity: 1, translate: '0 0' }], { duration: 210, easing: 'ease-out' });
+			};
 
 			const update = () => {
 				const query = input.value.trim();
@@ -160,24 +180,30 @@ const filters = [
 			};
 
 			buttons.forEach((button) => {
-				button.addEventListener('click', () => { platform = button.dataset.filter || 'all'; update(); }, { signal });
+				button.addEventListener('click', () => {
+					if (platform === button.dataset.filter) return;
+					platform = button.dataset.filter || 'all'; update(); remember(); showChange();
+				}, { signal });
 			});
 			viewButtons.forEach((button) => {
-				button.addEventListener('click', () => setView(button.dataset.view || 'illustrated'), { signal });
+				button.addEventListener('click', () => {
+					if (button.dataset.view !== this.dataset.view) { setView(button.dataset.view || 'illustrated'); remember(); showChange(); }
+				}, { signal });
 			});
-			input.addEventListener('input', update, { signal });
-			this.querySelector('form')?.addEventListener('submit', (event) => { event.preventDefault(); update(); }, { signal });
+			input.addEventListener('input', () => { update(); remember(); }, { signal });
+			this.querySelector('form')?.addEventListener('submit', (event) => { event.preventDefault(); update(); remember(); }, { signal });
 			this.querySelector('[data-library-reset]')?.addEventListener('click', () => {
 				platform = 'all';
 				input.value = '';
-				update();
-				input.focus({ preventScroll: true });
+				update(); remember(); showChange();
+				buttons[0]?.focus({ preventScroll: true });
+				buttons[0]?.scrollIntoView({ block: 'nearest' });
 			}, { signal });
-			setView(this.dataset.view || 'illustrated');
+			setView(remembered?.view ?? this.dataset.view ?? 'illustrated');
 			update();
 			controls.hidden = false;
 			views.hidden = false;
-			this.cleanup = () => controller.abort();
+			this.cleanup = () => { refresh?.cancel(); controller.abort(); };
 		}
 
 		disconnectedCallback() {
@@ -199,6 +225,13 @@ const filters = [
 	.content-intro h1 { margin: 28px 0; font-family: var(--serif-zh); font-size: clamp(48px, 6.8vw, 84px); font-weight: 400; line-height: 1.13; letter-spacing: -0.035em; }
 	.content-deck { margin: 0; font-size: clamp(16px, 1.7vw, 19px); line-height: 1.9; color: var(--ink-2); text-wrap: pretty; }
 	.content-hero-note { margin: 28px 0 0; padding-left: 14px; border-left: 1px solid var(--accent); font-size: 12px; line-height: 1.8; color: var(--ink-2); }
+	.content-jumps { display: flex; flex-wrap: wrap; gap: 0 20px; margin-top: 14px; }
+	.content-jumps a { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--accent); font: 13px var(--sans); text-underline-offset: 4px; }
+	.content-jumps a span { display: inline-block; }
+	@media (prefers-reduced-motion: no-preference) {
+		.content-jumps a span { transition: transform var(--motion-ui) var(--decel); }
+		.content-jumps a:is(:hover, :focus-visible) span { transform: translateY(3px); }
+	}
 	.content-overview { position: relative; margin: 0 0 7px; padding: 21px 0 0 21px; border-left: 1px solid var(--rule); }
 	.content-overview::before { content: ''; position: absolute; top: 0; left: 21px; width: 42px; border-top: 2px solid var(--accent); }
 	.content-overview-top { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 10px; color: var(--ink-2); }
@@ -220,7 +253,7 @@ const filters = [
 	.content-platforms button:hover { color: var(--ink); border-bottom-color: var(--ink); }
 	.content-search label { display: block; margin-bottom: 6px; font-size: 11px; color: var(--ink-2); }
 	.content-search-field { position: relative; }
-	.content-search input { width: 100%; min-width: 0; min-height: 44px; padding: 10px 40px 10px 0; border: 0; border-bottom: 1px solid var(--ink-2); border-radius: 0; background: transparent; color: var(--ink); font: 14px/1.5 var(--sans); }
+	.content-search input { width: 100%; min-width: 0; min-height: 44px; padding: 10px 40px 10px 0; border: 0; border-bottom: 1px solid var(--ink-2); border-radius: 0; background: transparent; color: var(--ink); font: 16px/1.5 var(--sans); }
 	.content-search input::placeholder { color: var(--ink-2); }
 	.content-search-field > span { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 24px; color: var(--ink-2); }
 	.content-platforms button:focus-visible, .content-search input:focus-visible, .content-empty button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
